@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
+                       xmlns:s="library://ns.adobe.com/flex/spark"
+                       xmlns:mx="library://ns.adobe.com/flex/mx"
+                       xmlns:ide="royalshield.components.*"
+                       xmlns:menu="royalshield.components.menu.*"
+                       implements="royalshield.core.IIDE"
+                       minWidth="800"
+                       minHeight="600"
+                       showStatusBar="false"
+                       backgroundColor="0x494949"
+                       preinitialize="applicationPreinitializeHandler(event)"
+                       creationComplete="applicationCreationCompleteHandler(event)" >
+    
+    <fx:Style source="../styles/royal_shield.css"/>
+    
+    <fx:Script>
+        <![CDATA[
+            import mx.events.FlexEvent;
+            
+            import royalshield.brushes.BrushManager;
+            import royalshield.brushes.IBrushManager;
+            import royalshield.drawing.DrawingManager;
+            import royalshield.drawing.IDrawingManager;
+            import royalshield.events.BrushEvent;
+            import royalshield.events.MenuEvent;
+            import royalshield.settings.ISettingsManager;
+            import royalshield.settings.RoyalShieldSettings;
+            import royalshield.settings.SettingsManager;
+            import royalshield.utils.DescriptorUtil;
+            import royalshield.world.IWorldMap;
+            import royalshield.world.WorldMap;
+            
+            //--------------------------------------------------------------------------
+            // PROPERTIES
+            //--------------------------------------------------------------------------
+            
+            private var m_settingsManager:ISettingsManager;
+            private var m_settings:RoyalShieldSettings;
+            private var m_brushManager:IBrushManager;
+            private var m_drawingManager:IDrawingManager;
+            private var m_worldMap:IWorldMap;
+            
+            //--------------------------------------
+            // Getters / Setters 
+            //--------------------------------------
+            
+            public function get settingsManager():ISettingsManager { return m_settingsManager; }
+            
+            //--------------------------------------------------------------------------
+            // METHODS
+            //--------------------------------------------------------------------------
+            
+            //--------------------------------------
+            // Private
+            //--------------------------------------
+            
+            private function loadSettings():void
+            {
+                m_settings = new RoyalShieldSettings();
+                m_settingsManager.loadSettings(m_settings);
+            }
+            
+            private function test():void
+            {
+                m_worldMap = new WorldMap();
+                editorPanel.worldMap = m_worldMap;
+                m_drawingManager.addTarget(editorPanel.mapDisplay);
+            }
+            
+            //--------------------------------------
+            // Event Handlers
+            //--------------------------------------
+            
+            protected function applicationPreinitializeHandler(event:FlexEvent):void
+            {
+                m_settingsManager = SettingsManager.getInstance();
+                m_brushManager = BrushManager.getInstance();
+                m_brushManager.cursorManager = this.cursorManager;
+                m_drawingManager = DrawingManager.getInstance();
+                
+                loadSettings();
+            }
+            
+            protected function applicationCreationCompleteHandler(event:FlexEvent):void
+            {
+               this.title = DescriptorUtil.getName() + " " + DescriptorUtil.getVersionLabel();
+               
+               test();
+            }
+            
+            protected function nativeMenuSelectedHandler(event:MenuEvent):void
+            {
+                switch(event.data)
+                {
+                    case IDEMenu.HELP_ABOUT:
+                        break;
+                }
+            }
+            
+            protected function toolsPanelBrushChangeHandler(event:BrushEvent):void
+            {
+                m_brushManager.brushType = event.brushType;
+            }
+            
+        ]]>
+    </fx:Script>
+    
+    <s:menu>
+        <menu:IDEMenu id="nativeMenu"
+                      selected="nativeMenuSelectedHandler(event)"/>
+    </s:menu>
+    
+    <ide:ToolsPanel id="toolsPanel"
+                    width="50"
+                    height="100%"
+                    brushChange="toolsPanelBrushChangeHandler(event)"/>
+    
+    <ide:EditorPanel id="editorPanel"
+                     width="100%"
+                     height="100%"
+                     left="55"
+                     right="255"/>
+    
+    <ide:ItemsPanel id="itemsPanel"
+                    width="250"
+                    height="100%"
+                    right="0"/>
+</s:WindowedApplication>

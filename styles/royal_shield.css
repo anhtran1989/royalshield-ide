@@ -1,0 +1,47 @@
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+
+global
+{
+    chromeColor: #454545;
+    color: #DFDFDF;
+    contentBackgroundColor: #494949;
+    symbolColor: #000000;
+    rollOverColor: #355D89;
+    selectionColor: #294867;
+    focusColor: #333300;
+    accentColor: #6589AD;
+}
+
+/*
+//--------------------------------------
+// mx components
+//--------------------------------------
+*/
+
+mx|ToolTip
+{
+    backgroundAlpha: 0.8;
+    backgroundColor: #272727;
+    borderStyle: solid;
+    borderColor: #FFFFFF;
+    color: #DFDFDF;
+    cornerRadius: 0;
+    fontSize: 11;
+}
+
+/*
+//--------------------------------------
+// spark components
+//--------------------------------------
+*/
+
+s|Button
+{
+    skinClass: ClassReference("royalshield.components.skins.ButtonSkin");
+}
+
+s|ToggleButton
+{
+    skinClass: ClassReference("royalshield.components.skins.ToggleButtonSkin");
+}

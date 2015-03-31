@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                   xmlns:s="library://ns.adobe.com/flex/spark"
+                   xmlns:mx="library://ns.adobe.com/flex/mx"
+                   xmlns:ide="royalshield.components.*"
+                   backgroundColor="0x000000"
+                   borderColor="0x000000"
+                   creationComplete="creationCompleteHandler(event)">
+    
+    <fx:Script>
+        <![CDATA[
+            import mx.events.FlexEvent;
+            
+            import royalshield.world.IWorldMap;
+            
+            //--------------------------------------------------------------------------
+            // PROPERTIES
+            //--------------------------------------------------------------------------
+            
+            private var m_map:IWorldMap;
+            private var m_scrollPoint:Point = new Point();
+            
+            //--------------------------------------
+            // Getters / Setters 
+            //--------------------------------------
+            
+            public function get worldMap():IWorldMap { return m_map; }
+            public function set worldMap(value:IWorldMap):void
+            {
+                if (m_map != value) {
+                    if (m_map)
+                        m_map.onPositionChanged.remove(mapPositionChangeCallback);
+                    
+                    m_map = value;
+                    
+                    if (mapDisplay)
+                        mapDisplay.worldMap = m_map;
+                    
+                    if (m_map)
+                        m_map.onPositionChanged.add(mapPositionChangeCallback);
+                    
+                    updateScrollMinMaxValues();
+                }
+            }
+            
+            public function get scrollPoint():Point
+            {
+                if (initialized)
+                    m_scrollPoint.setTo(horizontalScrollBar.value, verticalScrollBar.value);
+                else
+                    m_scrollPoint.setTo(0, 0);
+                
+                return m_scrollPoint;
+            }
+            
+            //--------------------------------------------------------------------------
+            // METHODS
+            //--------------------------------------------------------------------------
+            
+            //--------------------------------------
+            // Private
+            //--------------------------------------
+            
+            private function updateScrollMinMaxValues():void
+            {
+                if (m_map) {
+                    horizontalScrollBar.maximum = (m_map.width * (m_map.tileSize * mapDisplay.zoom)) - (mapDisplay.width - m_map.tileSize);
+                    verticalScrollBar.maximum = (m_map.height * (m_map.tileSize * mapDisplay.zoom)) - (mapDisplay.height - m_map.tileSize);
+                }
+            }
+            
+            private function mapPositionChangeCallback(x:uint, y:uint, z:uint):void
+            {
+                /*updateScrollMinMaxValues();
+                
+                var px:int = (x * (m_map.width * mapDisplay.zoom));
+                if (px !=  horizontalScrollBar.value)
+                    horizontalScrollBar.value = px;
+                
+                var py:int = (y * (m_map.height * mapDisplay.zoom));
+                if (py !=  verticalScrollBar.value)
+                    verticalScrollBar.value = py;*/
+            }
+            
+            //--------------------------------------
+            // Event Handlers
+            //--------------------------------------
+            
+            protected function creationCompleteHandler(event:FlexEvent):void
+            {
+                updateScrollMinMaxValues();
+                
+                mapDisplay.editorPanel = this;
+                
+                horizontalScrollBar.minimum = 0;
+                horizontalScrollBar.addEventListener(Event.CHANGE, scrollbarChangeHandler);
+                verticalScrollBar.minimum = 0;
+                verticalScrollBar.addEventListener(Event.CHANGE, scrollbarChangeHandler);
+            }
+            
+            protected function scrollbarChangeHandler(event:Event):void
+            {
+                if (m_map) {
+                    var x:uint = uint(horizontalScrollBar.value / (m_map.tileSize * mapDisplay.zoom));
+                    var y:uint = uint(verticalScrollBar.value / (m_map.tileSize * mapDisplay.zoom));
+                    m_map.setPosition(x, y, m_map.z);
+                }
+            }
+            
+        ]]>
+    </fx:Script>
+    
+    <ide:WorldMapDisplay id="mapDisplay"
+                         left="0"
+                         right="17"
+                         top="0"
+                         bottom="17"/>
+    
+    <s:HScrollBar id="horizontalScrollBar"
+                  focusEnabled="false"
+                  width="100%"
+                  right="17"
+                  bottom="0"/>
+    
+    <s:VScrollBar id="verticalScrollBar"
+                  focusEnabled="false"
+                  height="100%"
+                  right="0"
+                  bottom="17"/>
+</s:BorderContainer>
