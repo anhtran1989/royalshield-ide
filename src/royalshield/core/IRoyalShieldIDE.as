@@ -4,7 +4,7 @@ package royalshield.core
     
     import mx.core.IWindow;
     
-    public interface IIDE extends IWindow, IEventDispatcher
+    public interface IRoyalShieldIDE extends IWindow, IEventDispatcher
     {
         
     }

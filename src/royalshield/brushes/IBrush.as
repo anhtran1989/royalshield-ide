@@ -1,7 +1,5 @@
 package royalshield.brushes
 {
-    import mx.managers.ICursorManager;
-    
     import royalshield.drawing.IDrawingTarget;
     
     public interface IBrush
@@ -19,9 +17,6 @@ package royalshield.brushes
         
         function get brushManager():IBrushManager;
         function set brushManager(value:IBrushManager):void;
-        
-        function get cursorManager():ICursorManager;
-        function set cursorManager(value:ICursorManager):void;
         
         function doPress(target:IDrawingTarget, x:uint, y:uint):void;
         function doMove(x:uint, y:uint):void;

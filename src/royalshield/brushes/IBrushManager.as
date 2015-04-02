@@ -21,5 +21,8 @@ package royalshield.brushes
         function doDrag(x:uint, y:uint):void;
         function doMove(x:uint, y:uint):void;
         function doRelease(x:uint, y:uint):void;
+        
+        function showCursor():void;
+        function hideCursor():void;
     }
 }

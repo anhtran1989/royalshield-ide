@@ -7,7 +7,7 @@ package royalshield.components.menu
     import mx.events.FlexEvent;
     import mx.events.FlexNativeMenuEvent;
     
-    import royalshield.core.IIDE;
+    import royalshield.core.IRoyalShieldIDE;
     import royalshield.utils.CapabilitiesUtil;
     import royalshield.utils.DescriptorUtil;
     
@@ -19,7 +19,7 @@ package royalshield.components.menu
         // PROPERTIES
         //--------------------------------------------------------------------------
         
-        private var m_application:IIDE;
+        private var m_application:IRoyalShieldIDE;
         private var m_isMac:Boolean;
         
         //--------------------------------------------------------------------------
@@ -30,7 +30,7 @@ package royalshield.components.menu
         {
             super();
             
-            m_application = IIDE(FlexGlobals.topLevelApplication);
+            m_application = IRoyalShieldIDE(FlexGlobals.topLevelApplication);
             m_application.addEventListener(FlexEvent.CREATION_COMPLETE, creationComplete);
             m_isMac = CapabilitiesUtil.isMac;
             

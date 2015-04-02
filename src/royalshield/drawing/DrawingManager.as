@@ -1,6 +1,7 @@
 package royalshield.drawing
 {
     import flash.events.EventDispatcher;
+    import flash.events.MouseEvent;
     
     import royalshield.brushes.BrushManager;
     import royalshield.brushes.IBrushManager;
@@ -60,6 +61,8 @@ package royalshield.drawing
             target.addEventListener(DrawingEvent.BRUSH_DRAG, targetDragHandler);
             target.addEventListener(DrawingEvent.BRUSH_RELEASE, targetReleaseHandler);
             target.addEventListener(DrawingEvent.ZOOM, targetZoomChangeHandler);
+            target.addEventListener(MouseEvent.ROLL_OVER, targetRollOverHandler);
+            target.addEventListener(MouseEvent.ROLL_OUT, targetRollOutHandler);
         }
         
         private function removeListeners(target:IDrawingTarget):void
@@ -69,6 +72,8 @@ package royalshield.drawing
             target.removeEventListener(DrawingEvent.BRUSH_DRAG, targetDragHandler);
             target.removeEventListener(DrawingEvent.BRUSH_RELEASE, targetReleaseHandler);
             target.removeEventListener(DrawingEvent.ZOOM, targetZoomChangeHandler);
+            target.removeEventListener(MouseEvent.ROLL_OVER, targetRollOverHandler);
+            target.removeEventListener(MouseEvent.ROLL_OUT, targetRollOutHandler);
         }
         
         //--------------------------------------
@@ -98,6 +103,16 @@ package royalshield.drawing
         private function targetZoomChangeHandler(event:DrawingEvent):void
         {
             //dispatchEvent(new DrawingManagerEvent(DrawingManagerEvent.TARGET_ZOOM_CHANGE));
+        }
+        
+        private function targetRollOverHandler(event:MouseEvent):void
+        {
+            m_brushManager.showCursor();
+        }
+        
+        private function targetRollOutHandler(event:MouseEvent):void
+        {
+            m_brushManager.hideCursor();
         }
         
         //--------------------------------------------------------------------------

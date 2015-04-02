@@ -49,14 +49,7 @@ package royalshield.brushes
         }
         
         public function get cursorManager():ICursorManager { return m_cursorManager; }
-        public function set cursorManager(value:ICursorManager):void
-        { 
-            if (m_cursorManager != value) {
-                m_cursorManager = value;
-                if (m_brush)
-                    m_brush.cursorManager = value;
-            }
-        }
+        public function set cursorManager(value:ICursorManager):void { m_cursorManager = value; }
         
         //--------------------------------------------------------------------------
         // CONSTRUCTOR
@@ -104,6 +97,18 @@ package royalshield.brushes
                 m_brush.doRelease(x, y);
         }
         
+        public function showCursor():void
+        {
+            if (m_brush)
+                m_brush.showCursor();
+        }
+        
+        public function hideCursor():void
+        {
+            if (m_brush)
+                m_brush.hideCursor();
+        }
+        
         //--------------------------------------
         // Private
         //--------------------------------------
@@ -116,7 +121,6 @@ package royalshield.brushes
                 
                 m_brush.hideCursor();
                 m_brush.brushManager = null;
-                m_brush.cursorManager = null;
             }
             
             switch (type)
@@ -134,7 +138,6 @@ package royalshield.brushes
                 m_brush.itemId = m_itemId;
                 m_brush.zoom = m_zoom;
                 m_brush.brushManager = this;
-                m_brush.cursorManager = m_cursorManager;
             }
             
             dispatchEvent(new BrushEvent(BrushEvent.BRUSH_CHANGE, this.brushType));

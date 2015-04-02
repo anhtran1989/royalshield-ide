@@ -54,7 +54,7 @@ package royalshield.assets
             var type:GraphicType = new GraphicType();
             type.patternX = 4;
             type.patternY = 3;
-            type.spriteSheet = new GameAssets().getSpriteSheet(type, Bitmap(new GROUND_TEXTURE).bitmapData);
+            type.spriteSheet = GameAssets.getInstance().getSpriteSheet(type, Bitmap(new GROUND_TEXTURE).bitmapData);
             
             var ground:Ground = new Ground(0, "ground", 100);
             ground.graphic = new Graphic(type);
