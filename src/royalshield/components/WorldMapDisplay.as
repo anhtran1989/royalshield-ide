@@ -79,7 +79,22 @@ package royalshield.components
         public function get mouseDownY():uint { return m_mouseDownY; }
         
         public function get zoom():Number { return m_zoom; }
-        public function set zoom(value:Number):void { }
+        public function set zoom(value:Number):void
+        {
+            if (isNaN(value))
+                value = MIN_ZOOM;
+            else if (value < MIN_ZOOM)
+                value = MIN_ZOOM;
+            else if (value > MAX_ZOOM)
+                value = MAX_ZOOM;
+            
+            if (m_zoom != value) {
+                m_zoom = value;
+                invalidateDisplayList();
+                invalidateSize();
+                dispatchEvent(new DrawingEvent(DrawingEvent.ZOOM));
+            }
+        }
         
         //--------------------------------------------------------------------------
         // CONSTRUCTOR
@@ -125,8 +140,8 @@ package royalshield.components
             var w:Number = Math.min(CANVAS_WIDTH, unscaledWidth);
             var h:Number = Math.min(CANVAS_HEIGHT, unscaledHeight);
             
-            m_viewportX = int(w / (m_worldMap.tileSize * m_zoom)) + 1;
-            m_viewportY = int(h / (m_worldMap.tileSize * m_zoom)) + 1;
+            m_viewportX = int(w / (GameConsts.VIEWPORT_TILE_SIZE * m_zoom)) + 1;
+            m_viewportY = int(h / (GameConsts.VIEWPORT_TILE_SIZE * m_zoom)) + 1;
             m_tilesSum = m_viewportX + m_viewportY;
             m_tilesTotal = m_viewportX * m_viewportY;
             m_matrix.a = m_zoom;
@@ -193,7 +208,7 @@ package royalshield.components
         
         private function drawGrid(width:Number, height:Number):void
         {
-            var size:Number = m_worldMap.tileSize * this.zoom;
+            var size:Number = GameConsts.VIEWPORT_TILE_SIZE * m_zoom;
             var g:Graphics = m_gridSurface.graphics;
             g.clear();
             g.lineStyle(0.5, 0x000000, 0.1);
@@ -209,18 +224,18 @@ package royalshield.components
         
         private function refreshMouseMap():void
         {
-            var size:Number = GameConsts.VIEWPORT_TILE_SIZE * zoom;
-            var posx:int = int((mouseX - m_matrix.tx) / m_matrix.a / size);
+            var size:Number = GameConsts.VIEWPORT_TILE_SIZE * m_zoom;
+            var posx:int = int(this.mouseX / size);
             if (posx < 0 || posx > m_viewportX)
                 return;
             
-            var posy:int = int((mouseY - m_matrix.ty) / m_matrix.d / size);
+            var posy:int = int(this.mouseY / size);
             if (posy < 0 || posy > m_viewportY)
                 return;
             
             var scrollPoint:Point = editorPanel.scrollPoint;
-            m_mouseMapX = uint(scrollPoint.x / size) + posx;
-            m_mouseMapY = uint(scrollPoint.y / size) + posy;
+            m_mouseMapX = scrollPoint.x + posx;
+            m_mouseMapY = scrollPoint.y + posy;
             m_mouseMapZ = m_worldMap.z;
         }
         
@@ -243,7 +258,7 @@ package royalshield.components
         { 
             refreshMouseMap();
             m_mouseDownX = m_mouseMapX;
-            m_mouseDownY = m_mouseDownY;
+            m_mouseDownY = m_mouseMapY;
             m_mouseDown = true;
             
             systemManager.stage.addEventListener(MouseEvent.MOUSE_UP, mouseUpHandler);

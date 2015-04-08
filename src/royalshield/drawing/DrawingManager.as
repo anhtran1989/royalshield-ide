@@ -20,6 +20,12 @@ package royalshield.drawing
         private var m_currentTarget:IDrawingTarget;
         private var m_brushManager:IBrushManager;
         
+        //--------------------------------------
+        // Getters / Setters
+        //--------------------------------------
+        
+        public function get currentTarget():IDrawingTarget { return m_currentTarget; }
+        
         //--------------------------------------------------------------------------
         // CONSTRUCTOR
         //--------------------------------------------------------------------------

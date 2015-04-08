@@ -4,6 +4,8 @@ package royalshield.drawing
     
     public interface IDrawingManager extends IEventDispatcher
     {
+        function get currentTarget():IDrawingTarget;
+        
         function addTarget(target:IDrawingTarget):void;
     }
 }

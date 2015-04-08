@@ -10,16 +10,23 @@
     
     <fx:Script>
         <![CDATA[
+            import mx.core.FlexGlobals;
             import mx.events.FlexEvent;
+            import mx.events.ResizeEvent;
             
+            import royalshield.core.GameConsts;
+            import royalshield.core.IRoyalShieldIDE;
+            import royalshield.events.DrawingEvent;
             import royalshield.world.IWorldMap;
             
             //--------------------------------------------------------------------------
             // PROPERTIES
             //--------------------------------------------------------------------------
             
+            private var m_application:IRoyalShieldIDE;
             private var m_map:IWorldMap;
             private var m_scrollPoint:Point = new Point();
+            private var m_timer:Timer;
             
             //--------------------------------------
             // Getters / Setters 
@@ -30,7 +37,7 @@
             {
                 if (m_map != value) {
                     if (m_map)
-                        m_map.onPositionChanged.remove(mapPositionChangeCallback);
+                        m_map.onPositionChanged.remove(mapPositionChangedCallback);
                     
                     m_map = value;
                     
@@ -38,9 +45,9 @@
                         mapDisplay.worldMap = m_map;
                     
                     if (m_map)
-                        m_map.onPositionChanged.add(mapPositionChangeCallback);
+                        m_map.onPositionChanged.add(mapPositionChangedCallback);
                     
-                    updateScrollMinMaxValues();
+                    updateScrollBarValues();
                 }
             }
             
@@ -59,28 +66,69 @@
             //--------------------------------------------------------------------------
             
             //--------------------------------------
+            // Public
+            //--------------------------------------
+            
+            public function onMoveMapNorth():void
+            {
+                if (m_map)
+                    m_map.setPosition(m_map.x, Math.max(0, m_map.y - 1), m_map.z);
+            }
+            
+            public function onMoveMapSouth():void
+            {
+                if (m_map)
+                    m_map.setPosition(m_map.x, Math.min(verticalScrollBar.maximum, m_map.y + 1), m_map.z);
+            }
+            
+            public function onMoveMapWest():void
+            {
+                if (m_map)
+                    m_map.setPosition(Math.max(0, m_map.x - 1), m_map.y, m_map.z);
+            }
+            
+            public function onMoveMapEast():void
+            {
+                if (m_map)
+                    m_map.setPosition(Math.min(horizontalScrollBar.maximum, m_map.x + 1), m_map.y, m_map.z);
+            }
+            
+            
+            //--------------------------------------
             // Private
             //--------------------------------------
             
-            private function updateScrollMinMaxValues():void
+            private function updateScrollBarValues():void
             {
                 if (m_map) {
-                    horizontalScrollBar.maximum = (m_map.width * (m_map.tileSize * mapDisplay.zoom)) - (mapDisplay.width - m_map.tileSize);
-                    verticalScrollBar.maximum = (m_map.height * (m_map.tileSize * mapDisplay.zoom)) - (mapDisplay.height - m_map.tileSize);
+                    horizontalScrollBar.maximum = m_map.width - int(mapDisplay.width / GameConsts.VIEWPORT_TILE_SIZE * mapDisplay.zoom);
+                    verticalScrollBar.maximum = m_map.height - int(mapDisplay.height / GameConsts.VIEWPORT_TILE_SIZE * mapDisplay.zoom);
                 }
             }
             
-            private function mapPositionChangeCallback(x:uint, y:uint, z:uint):void
+            private function updateMapPosition():void
             {
-                /*updateScrollMinMaxValues();
-                
-                var px:int = (x * (m_map.width * mapDisplay.zoom));
-                if (px !=  horizontalScrollBar.value)
-                    horizontalScrollBar.value = px;
-                
-                var py:int = (y * (m_map.height * mapDisplay.zoom));
-                if (py !=  verticalScrollBar.value)
-                    verticalScrollBar.value = py;*/
+                if (m_map) {
+                    var x:uint = horizontalScrollBar.value;
+                    var y:uint = verticalScrollBar.value;
+                    if (m_map.inMapRange(x, y, m_map.z))
+                        m_map.setPosition(x, y, m_map.z);
+                }
+            }
+            
+            private function update():void
+            {
+                updateScrollBarValues();
+                updateMapPosition();
+            }
+            
+            private function mapPositionChangedCallback(x:uint, y:uint, z:uint):void
+            {
+                if (horizontalScrollBar.value != x || verticalScrollBar.value != y) {
+                    updateScrollBarValues();
+                    horizontalScrollBar.value = x;
+                    verticalScrollBar.value = y;
+                }
             }
             
             //--------------------------------------
@@ -89,8 +137,10 @@
             
             protected function creationCompleteHandler(event:FlexEvent):void
             {
-                updateScrollMinMaxValues();
-                
+                m_application = IRoyalShieldIDE(FlexGlobals.topLevelApplication);
+                m_application.nativeWindow.addEventListener(NativeWindowDisplayStateEvent.DISPLAY_STATE_CHANGE, stateChangeHandler);
+                m_timer = new Timer(100);
+                m_timer.addEventListener(TimerEvent.TIMER, timeCompleteHandler);
                 mapDisplay.editorPanel = this;
                 
                 horizontalScrollBar.minimum = 0;
@@ -101,11 +151,20 @@
             
             protected function scrollbarChangeHandler(event:Event):void
             {
-                if (m_map) {
-                    var x:uint = uint(horizontalScrollBar.value / (m_map.tileSize * mapDisplay.zoom));
-                    var y:uint = uint(verticalScrollBar.value / (m_map.tileSize * mapDisplay.zoom));
-                    m_map.setPosition(x, y, m_map.z);
-                }
+                updateMapPosition();
+            }
+            
+            protected function timeCompleteHandler(event:TimerEvent):void
+            {
+                updateScrollBarValues();
+                updateMapPosition();
+                m_timer.stop();
+            }
+            
+            protected function stateChangeHandler(event:NativeWindowDisplayStateEvent):void
+            {
+                if (m_timer && !m_timer.running)
+                    m_timer.start();
             }
             
         ]]>
@@ -115,7 +174,9 @@
                          left="0"
                          right="17"
                          top="0"
-                         bottom="17"/>
+                         bottom="17"
+                         zoom="updateScrollBarValues();"
+                         resize="update();"/>
     
     <s:HScrollBar id="horizontalScrollBar"
                   focusEnabled="false"
