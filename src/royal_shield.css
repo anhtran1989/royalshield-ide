@@ -1,5 +1,6 @@
 @namespace s "library://ns.adobe.com/flex/spark";
 @namespace mx "library://ns.adobe.com/flex/mx";
+@namespace ide "royalshield.components.*";
 
 global
 {
@@ -44,4 +45,16 @@ s|Button
 s|ToggleButton
 {
     skinClass: ClassReference("royalshield.components.skins.ToggleButtonSkin");
+}
+
+/*
+//--------------------------------------
+// ide components
+//--------------------------------------
+*/
+
+ide|ShadowLine
+{
+    lineColor: #272727;
+    shadowColor: #565656;
 }

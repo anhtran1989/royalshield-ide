@@ -66,6 +66,7 @@
             {
                 m_worldMap = new WorldMap();
                 editorPanel.worldMap = m_worldMap;
+                editorPanel.mapDisplay.onMouseMapChanged.add(mouseMapChangedCallback);
                 m_drawingManager.addTarget(editorPanel.mapDisplay);
             }
             
@@ -130,6 +131,12 @@
                 }
             }
             
+            private function mouseMapChangedCallback(x:uint, y:uint, z:uint):void
+            {
+                if (statusbar && statusbar.positionLabel)
+                    statusbar.positionLabel.text = "x:" + x + ", y:" + y + ", z:" + z;
+            }
+            
         ]]>
     </fx:Script>
     
@@ -145,7 +152,7 @@
                     width="50"
                     height="100%"
                     top="35"
-                    bottom="20"
+                    bottom="23"
                     brushChange="toolsPanelBrushChangeHandler(event)"/>
     
     <ide:EditorPanel id="editorPanel"
@@ -154,17 +161,17 @@
                      left="55"
                      right="255"
                      top="35"
-                     bottom="20"/>
+                     bottom="23"/>
     
     <ide:ObjectsPanel id="objectsPanel"
                     width="250"
                     height="100%"
                     right="0"
                     top="35"
-                    bottom="20"/>
+                    bottom="23"/>
     
-    <ide:StatusBar id="toolbar"
+    <ide:StatusBar id="statusbar"
                    width="100%"
-                   height="20"
+                   height="23"
                    bottom="0"/>
 </s:WindowedApplication>

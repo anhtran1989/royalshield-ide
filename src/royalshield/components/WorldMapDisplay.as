@@ -14,6 +14,7 @@ package royalshield.components
     import royalshield.drawing.IDrawingTarget;
     import royalshield.entities.items.Item;
     import royalshield.events.DrawingEvent;
+    import royalshield.signals.Signal;
     import royalshield.world.IWorldMap;
     import royalshield.world.Tile;
     
@@ -47,6 +48,8 @@ package royalshield.components
         private var m_zoom:Number;
         private var m_gridSurface:FlexShape;
         private var m_showGrid:Boolean;
+        
+        private var m_mouseMapChanged:Signal;
         
         //--------------------------------------
         // Getters / Setters 
@@ -96,6 +99,8 @@ package royalshield.components
             }
         }
         
+        public function get onMouseMapChanged():Signal { return m_mouseMapChanged; }
+        
         //--------------------------------------------------------------------------
         // CONSTRUCTOR
         //--------------------------------------------------------------------------
@@ -108,6 +113,8 @@ package royalshield.components
             m_matrix = new Matrix();
             m_showGrid = true;
             m_zoom = 1.0;
+            
+            m_mouseMapChanged = new Signal();
             
             addEventListener(MouseEvent.MOUSE_DOWN, mouseDownHandler);
             addEventListener(MouseEvent.MOUSE_MOVE, mouseMoveHandler);
@@ -234,9 +241,16 @@ package royalshield.components
                 return;
             
             var scrollPoint:Point = editorPanel.scrollPoint;
-            m_mouseMapX = scrollPoint.x + posx;
-            m_mouseMapY = scrollPoint.y + posy;
-            m_mouseMapZ = m_worldMap.z;
+            var x:uint = scrollPoint.x + posx;
+            var y:uint = scrollPoint.y + posy;
+            var z:uint = m_worldMap.z;
+            
+            if (m_mouseMapX != x || m_mouseMapY != y || m_mouseMapZ != z) {
+                m_mouseMapX = x;
+                m_mouseMapY = y;
+                m_mouseMapZ = z;
+                m_mouseMapChanged.dispatch(m_mouseMapX, m_mouseMapY, m_mouseMapZ);
+            }
         }
         
         private function mapPositionChangeCallback(x:uint, y:uint, z:uint):void
