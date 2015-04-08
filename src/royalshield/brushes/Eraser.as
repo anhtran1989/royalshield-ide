@@ -8,6 +8,11 @@ package royalshield.brushes
     
     import royalshield.core.GameAssets;
     import royalshield.drawing.IDrawingTarget;
+    import royalshield.entities.items.Item;
+    import royalshield.geom.Position;
+    import royalshield.history.HistoryActionGroup;
+    import royalshield.history.MapHistoryAction;
+    import royalshield.history.RSHistoryManager;
     import royalshield.world.Tile;
     
     public class Eraser implements IBrush
@@ -24,6 +29,7 @@ package royalshield.brushes
         private var m_zoom:Number;
         private var m_cursorId:uint;
         private var m_cursor:Shape;
+        private var m_actions:Vector.<MapHistoryAction>;
         
         //--------------------------------------
         // Getters / Setters 
@@ -52,6 +58,7 @@ package royalshield.brushes
             m_size = 1;
             m_zoom = 1.0;
             m_type = BrushType.ERASER;
+            m_actions = new Vector.<MapHistoryAction>();
         }
         
         //--------------------------------------------------------------------------
@@ -79,13 +86,31 @@ package royalshield.brushes
             if (!tile || tile == m_lastTile)
                 return;
             
-            m_target.worldMap.deleteTile(tile);
-            m_lastTile = m_target.worldMap.getTile(m_target.mouseMapX, m_target.mouseMapY, m_target.mouseMapZ);
+            m_lastTile = tile;
+            
+            var item:Item = m_target.worldMap.getTopItemAt(m_target.mouseMapX, m_target.mouseMapY, m_target.mouseMapZ);
+            if (item && tile.removeItem(item)) {
+                m_actions[m_actions.length] = new MapHistoryAction(new Position(tile.x, tile.y, tile.z), null, item, -1, -1);
+                
+                if (tile.itemCount == 0)
+                    m_target.worldMap.deleteTile(tile);
+            }
         }
         
         public function doRelease(x:uint, y:uint):void
         {
-            //
+            m_lastTile = null;
+            
+            var length:uint = m_actions.length;
+            if (length > 0) {
+                var actionGroup:HistoryActionGroup = new HistoryActionGroup("Remove");
+                
+                for (var i:int = 0; i < length; i++)
+                    actionGroup.addAction(m_actions[i]);
+                
+                m_actions.length = 0;
+                RSHistoryManager.getInstance().addActionGroup(actionGroup);
+            }
         }
         
         public function forceCommit():void

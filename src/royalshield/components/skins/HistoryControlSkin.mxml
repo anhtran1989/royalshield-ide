@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<s:Skin xmlns:fx="http://ns.adobe.com/mxml/2009"
+        xmlns:s="library://ns.adobe.com/flex/spark"
+        xmlns:fb="http://ns.adobe.com/flashbuilder/2009"
+        xmlns:ide="royalshield.components.*"
+        alpha.disabled="0.5">
+    
+    <!-- host component -->
+    <fx:Metadata>
+        [HostComponent("royalshield.components.HistoryControl")]
+    </fx:Metadata>
+    
+    <!-- states -->
+    <s:states>
+        <s:State name="normal" />
+        <s:State name="disabled" />
+    </s:states>
+    
+    <s:Group id="contentGroup"
+             left="0"
+             right="0"
+             top="0"
+             bottom="0"
+             minWidth="0"
+             minHeight="0">
+        
+        <s:layout>
+            <s:HorizontalLayout gap="0"/>
+        </s:layout>
+        
+        <ide:DropDownButton id="undoButton"
+                             icon="@Embed(source='../assets/undo_icon.png')"
+                             toolTip="Undo"/>
+        
+        <ide:DropDownButton id="redoButton"
+                             icon="@Embed(source='../assets/redo_icon.png')"
+                             toolTip="Redo"/>
+    </s:Group>
+</s:Skin>

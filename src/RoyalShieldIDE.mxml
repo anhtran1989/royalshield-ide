@@ -20,11 +20,15 @@
             import mx.events.FlexEvent;
             
             import royalshield.brushes.BrushManager;
+            import royalshield.brushes.BrushType;
             import royalshield.brushes.IBrushManager;
             import royalshield.drawing.DrawingManager;
             import royalshield.drawing.IDrawingManager;
             import royalshield.events.BrushEvent;
             import royalshield.events.MenuEvent;
+            import royalshield.history.HistoryActionGroup;
+            import royalshield.history.IHistoryManager;
+            import royalshield.history.RSHistoryManager;
             import royalshield.settings.ISettingsManager;
             import royalshield.settings.RoyalShieldSettings;
             import royalshield.settings.SettingsManager;
@@ -40,6 +44,7 @@
             private var m_settings:RoyalShieldSettings;
             private var m_brushManager:IBrushManager;
             private var m_drawingManager:IDrawingManager;
+            private var m_historyManager:IHistoryManager;
             private var m_worldMap:IWorldMap;
             
             //--------------------------------------
@@ -68,6 +73,7 @@
                 editorPanel.worldMap = m_worldMap;
                 editorPanel.mapDisplay.onMouseMapChanged.add(mouseMapChangedCallback);
                 m_drawingManager.addTarget(editorPanel.mapDisplay);
+                RSHistoryManager(m_historyManager).map = m_worldMap;
             }
             
             //--------------------------------------
@@ -80,6 +86,8 @@
                 m_brushManager = BrushManager.getInstance();
                 m_brushManager.cursorManager = this.cursorManager;
                 m_drawingManager = DrawingManager.getInstance();
+                m_historyManager = RSHistoryManager.getInstance();
+                m_historyManager.addActionGroup(new HistoryActionGroup("default"));
                 
                 loadSettings();
             }
@@ -112,6 +120,14 @@
                 if (!event.controlKey && !event.shiftKey) {
                     switch(keyCode)
                     {
+                        case Keyboard.B:
+                            toolsPanel.selectedType = BrushType.BRUSH;
+                            break;
+                        
+                        case Keyboard.E:
+                            toolsPanel.selectedType = BrushType.ERASER;
+                            break;
+                        
                         case Keyboard.UP:
                             editorPanel.onMoveMapNorth();
                             break;
@@ -126,6 +142,17 @@
                         
                         case Keyboard.RIGHT:
                             editorPanel.onMoveMapEast();
+                            break;
+                    }
+                } else if (event.controlKey && !event.shiftKey) {
+                    switch(keyCode)
+                    {
+                        case Keyboard.Z:
+                            m_historyManager.undo();
+                            break;
+                        
+                        case Keyboard.Y:
+                            m_historyManager.redo();
                             break;
                     }
                 }

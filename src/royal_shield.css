@@ -53,6 +53,16 @@ s|ToggleButton
 //--------------------------------------
 */
 
+ide|DropDownButton
+{
+    skinClass: ClassReference("royalshield.components.skins.DropDownButtonSkin");
+}
+
+ide|HistoryControl
+{
+    skinClass: ClassReference("royalshield.components.skins.HistoryControlSkin");
+}
+
 ide|ShadowLine
 {
     lineColor: #272727;

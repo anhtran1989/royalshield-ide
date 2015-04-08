@@ -13,6 +13,10 @@ package royalshield.brushes
     import royalshield.core.GameAssets;
     import royalshield.drawing.IDrawingTarget;
     import royalshield.entities.items.Item;
+    import royalshield.geom.Position;
+    import royalshield.history.HistoryActionGroup;
+    import royalshield.history.MapHistoryAction;
+    import royalshield.history.RSHistoryManager;
     import royalshield.world.Tile;
     
     use namespace mx_internal;
@@ -32,6 +36,7 @@ package royalshield.brushes
         private var m_zoom:Number;
         private var m_cursorId:uint;
         private var m_cursor:Shape;
+        private var m_actions:Vector.<MapHistoryAction>;
         
         //--------------------------------------
         // Getters / Setters 
@@ -60,6 +65,7 @@ package royalshield.brushes
             m_size = 1;
             m_zoom = 1.0;
             m_type = BrushType.BRUSH;
+            m_actions = new Vector.<MapHistoryAction>();
         }
         
         //--------------------------------------------------------------------------
@@ -72,10 +78,10 @@ package royalshield.brushes
         
         public function doPress(target:IDrawingTarget, x:uint, y:uint):void
         {
-            //if (m_itemId == 0) return;
-            
-            m_target = target;
-            doDrag(x, y);
+            if (m_itemId != 0) {
+                m_target = target;
+                doDrag(x, y);
+            }
         }
         
         public function doMove(x:uint, y:uint):void
@@ -97,12 +103,25 @@ package royalshield.brushes
                 return;
             
             m_lastTile = tile;
-            m_lastTile.addItem(item);
+            if (m_lastTile.addItem(item)){
+                var index:int = tile.indexOfItem(item);
+                m_actions[m_actions.length] = new MapHistoryAction(null, new Position(tile.x, tile.y, tile.z), item, -1, index);
+            }
         }
         
         public function doRelease(x:uint, y:uint):void
         {
             m_lastTile = null;
+            
+            var length:uint = m_actions.length;
+            if (length > 0) {
+                var actionGroup:HistoryActionGroup = new HistoryActionGroup("Add");
+                for (var i:int = 0; i < length; i++)
+                    actionGroup.addAction(m_actions[i]);
+                
+                m_actions.length = 0;
+                RSHistoryManager.getInstance().addActionGroup(actionGroup);
+            }
         }
         
         public function forceCommit():void

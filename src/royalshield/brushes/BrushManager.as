@@ -138,6 +138,7 @@ package royalshield.brushes
                 m_brush.itemId = m_itemId;
                 m_brush.zoom = m_zoom;
                 m_brush.brushManager = this;
+                m_brush.showCursor();
             }
             
             dispatchEvent(new BrushEvent(BrushEvent.BRUSH_CHANGE, this.brushType));

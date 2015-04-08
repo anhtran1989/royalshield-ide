@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<s:Skin xmlns:fx="http://ns.adobe.com/mxml/2009"
+        xmlns:s="library://ns.adobe.com/flex/spark"
+        xmlns:mx="library://ns.adobe.com/flex/mx"
+        xmlns:nail="nail.components.*"
+        alpha.disabled="0.5">
+    
+    <!-- host component -->
+    <fx:Metadata>
+        [HostComponent("royalshield.components.DropDownButton")]
+    </fx:Metadata>
+    
+    <!-- states -->
+    <s:states>
+        <s:State name="up"/>
+        <s:State name="over"/>
+        <s:State name="down"/>
+        <s:State name="open"/>
+        <s:State name="disabled"/>
+    </s:states>
+    
+    <s:Group width="25"
+             height="25"
+             alpha="0"
+             alpha.over="1"
+             alpha.open="1"
+             alpha.down="0.5"
+             mouseEnabled="false">
+        
+        <!-- fill -->
+        <s:Rect left="1" right="1" top="1" bottom="1">
+            <s:fill>
+                <s:LinearGradient rotation="90">
+                    <s:GradientEntry color="0x626262" 
+                                     color.over="0x6E6E6E"
+                                     color.down="0x414141"
+                                     alpha="0.85" />
+                    <s:GradientEntry color="0x535353" 
+                                     color.over="0x606060"
+                                     color.down="0x414141"
+                                     alpha="0.85" />
+                </s:LinearGradient>
+            </s:fill>
+        </s:Rect>
+        
+        <!-- border -->
+        <s:Rect left="0" right="0" top="0" bottom="0">
+            <s:stroke>
+                <s:SolidColorStroke color="0x272727"/>
+            </s:stroke>
+        </s:Rect>
+        
+        <!-- highlight -->
+        <s:Rect left="1" right="1" top="1" bottom="1" alpha="0">
+            <s:stroke>
+                <s:LinearGradientStroke rotation="90" weight="1">
+                    <s:GradientEntry color="0x787878" alpha="1" ratio="0"/>
+                    <s:GradientEntry color="0x787878" alpha="0.3" ratio="1"/>
+                </s:LinearGradientStroke>
+            </s:stroke>
+        </s:Rect>
+    </s:Group>
+    
+    <s:Group width="15"
+             height="25"
+             left="25"
+             alpha="0"
+             alpha.over="1"
+             alpha.open="1"
+             alpha.down="0.5"
+             mouseEnabled="false">
+        
+        <!-- fill -->
+        <s:Rect left="1" right="1" top="1" bottom="1">
+            <s:fill>
+                <s:LinearGradient rotation="90">
+                    <s:GradientEntry color="0x626262" 
+                                     color.over="0x6E6E6E"
+                                     color.down="0x414141"
+                                     color.open="0x353535"
+                                     alpha="0.85" />
+                    <s:GradientEntry color="0x535353" 
+                                     color.over="0x606060"
+                                     color.down="0x414141"
+                                     color.open="0x414141"
+                                     alpha="0.85" />
+                </s:LinearGradient>
+            </s:fill>
+        </s:Rect>
+        
+        <!-- border -->
+        <s:Rect left="0" right="0" top="0" bottom="0">
+            <s:stroke>
+                <s:SolidColorStroke color="0x272727"/>
+            </s:stroke>
+        </s:Rect>
+        
+        <!-- highlight -->
+        <s:Rect left="1" right="1" top="1" bottom="1">
+            <s:stroke>
+                <s:LinearGradientStroke rotation="90" weight="1">
+                    <s:GradientEntry color="0x787878" alpha="1" ratio="0"/>
+                    <s:GradientEntry color="0x787878" alpha="0.3" ratio="1"/>
+                </s:LinearGradientStroke>
+            </s:stroke>
+        </s:Rect>
+    </s:Group>
+    
+    <!-- arrow-->
+    <s:Path right="4"
+            verticalCenter="0"
+            data="M 4.0 4.0 L 4.0 3.0 L 5.0 3.0 L 5.0 2.0 L 6.0 2.0 L 6.0 1.0 L 7.0 1.0 L 7.0 0.0 L 0.0 0.0 L 0.0 1.0 L 1.0 1.0 L 1.0 2.0 L 2.0 2.0 L 2.0 3.0 L 3.0 3.0 L 3.0 4.0 L 4.0 4.0">
+        <s:fill>
+            <s:RadialGradient rotation="90" focalPointRatio="1">
+                <s:GradientEntry color="0xDFDFDF" alpha="0.6" />
+                <s:GradientEntry color="0xDFDFDF" alpha="0.8" />
+            </s:RadialGradient>
+        </s:fill>
+    </s:Path>
+    
+    <s:BitmapImage id="iconDisplay"
+                   left="4"
+                   verticalCenter="0"/>
+    
+    <!-- popup -->
+    <s:PopUpAnchor id="popUp"
+                   displayPopUp="false"
+                   displayPopUp.open="true"
+                   includeIn="open"
+                   left="0"
+                   right="0"
+                   top="0"
+                   bottom="0"
+                   itemDestructionPolicy="auto"
+                   popUpPosition="below">
+        
+        <s:BorderContainer id="dropDown"
+                           width="200"
+                           height="250"
+                           color="0x494949"
+                           borderColor="0x272727">
+            
+            <s:List id="list"
+                    width="100%"
+                    height="100%"
+                    fontSize="11"
+                    contentBackgroundColor="0x494949"
+                    color="0xDFDFDF"
+                    selectionColor="0x294867"
+                    rollOverColor="0x355D89"
+                    borderVisible="false"/>
+        </s:BorderContainer>
+    </s:PopUpAnchor>
+    
+    <s:HGroup width="100%"
+              height="100%"
+              gap="0">
+        
+        <s:Button id="button"
+                  width="25"
+                  height="25"
+                  alpha="0"/>
+        
+        <s:Button id="openButton"
+                  width="15"
+                  height="25"
+                  alpha="0"/>
+    </s:HGroup>
+</s:Skin>

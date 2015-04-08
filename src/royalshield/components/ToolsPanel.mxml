@@ -22,19 +22,19 @@
             // PROPERTIES
             //--------------------------------------------------------------------------
             
-            private var m_selectedTool:String;
+            private var m_selectedType:String;
             
             //--------------------------------------
             // Getters / Setters 
             //--------------------------------------
             
-            public function get selectedTool():String { return m_selectedTool; }
-            public function set selectedTool(value:String):void
+            public function get selectedType():String { return m_selectedType; }
+            public function set selectedType(value:String):void
             {
-                if (m_selectedTool != value) {
+                if (m_selectedType != value) {
                     if (selectButton(value)) {
-                        m_selectedTool = value;
-                        dispatchEvent(new BrushEvent(BrushEvent.BRUSH_CHANGE, m_selectedTool));
+                        m_selectedType = value;
+                        dispatchEvent(new BrushEvent(BrushEvent.BRUSH_CHANGE, m_selectedType));
                     }
                 }
             }
@@ -73,10 +73,10 @@
             protected function buttonClickHandler(event:Event):void
             {
                 var type:String = BrushButton(event.target).brushType;
-                if (m_selectedTool == type)
+                if (m_selectedType == type)
                     BrushButton(event.target).selected = true;
                 else 
-                    selectedTool = type;
+                    selectedType = type;
             }
         ]]>
     </fx:Script>
