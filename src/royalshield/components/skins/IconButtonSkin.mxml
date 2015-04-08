@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<s:SparkButtonSkin xmlns:fx="http://ns.adobe.com/mxml/2009"
+                   xmlns:s="library://ns.adobe.com/flex/spark"
+                   xmlns:fb="http://ns.adobe.com/flashbuilder/2009"
+                   minWidth="23"
+                   minHeight="23"
+                   alpha.disabled="0.5">
+    
+    <!-- host component -->
+    <fx:Metadata>
+        <![CDATA[[HostComponent("spark.components.Button")]]]>
+    </fx:Metadata>
+    
+    <!-- states -->
+    <s:states>
+        <s:State name="up" />
+        <s:State name="over" stateGroups="overDownStates"/>
+        <s:State name="down" stateGroups="overDownStates"/>
+        <s:State name="disabled" />
+    </s:states>
+    
+    <!-- fill -->
+    <s:Rect left="1" right="1" top="1" bottom="1" alpha="0" alpha.overDownStates="1">
+        <s:fill>
+            <s:LinearGradient rotation="90">
+                <s:GradientEntry color="0x626262" 
+                                 color.over="0x6E6E6E" 
+                                 color.down="0x414141" 
+                                 alpha="0.85" />
+                <s:GradientEntry color="0x535353" 
+                                 color.over="0x606060" 
+                                 color.down="0x414141" 
+                                 alpha="0.85" />
+            </s:LinearGradient>
+        </s:fill>
+    </s:Rect>
+    
+    <!-- border -->
+    <s:Rect left="0" right="0" top="0" bottom="0" alpha="0" alpha.overDownStates="1">
+        <s:stroke>
+            <s:SolidColorStroke color="0x272727"/>
+        </s:stroke>
+    </s:Rect>
+    
+    <!-- highlight -->
+    <s:Rect left="1" right="1" top="1" bottom="1" alpha="0" alpha.overDownStates="1">
+        <s:stroke>
+            <s:LinearGradientStroke rotation="90" weight="1">
+                <s:GradientEntry color="0x787878" alpha="1" ratio="0" />
+                <s:GradientEntry color="0x787878" alpha="0.3" ratio="1" />
+            </s:LinearGradientStroke>
+        </s:stroke>
+    </s:Rect>
+    
+    <!-- highlight external -->
+    <s:Rect left="-1" right="-1" top="-1" bottom="-1" alpha="0" alpha.overDownStates="1">
+        <s:stroke>
+            <s:LinearGradientStroke rotation="90" weight="1">
+                <s:GradientEntry color="0x636363" alpha="0" ratio="0" />
+                <s:GradientEntry color="0x636363" alpha="0.8" ratio="1" />
+            </s:LinearGradientStroke>
+        </s:stroke>
+    </s:Rect>
+    
+    <!-- text -->
+    <s:Label id="labelDisplay"
+             textAlign="center"
+             maxDisplayedLines="1"
+             horizontalCenter="0"
+             verticalCenter="1"
+             verticalAlign="middle"
+             left="7"
+             right="7"
+             top="2"
+             color="0xDFDFDF"
+             bottom="2"/>
+</s:SparkButtonSkin>

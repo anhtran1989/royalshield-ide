@@ -2,7 +2,8 @@
 
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
          xmlns:s="library://ns.adobe.com/flex/spark"
-         xmlns:mx="library://ns.adobe.com/flex/mx">
+         xmlns:mx="library://ns.adobe.com/flex/mx"
+         xmlns:ide="royalshield.components.*">
     
     <!-- highlight -->
     <s:Rect left="-1" right="-1" top="1" bottom="0">
@@ -17,4 +18,36 @@
             <s:SolidColorStroke color="0x272727"/>
         </s:stroke>
     </s:Rect>
+    
+    <s:HGroup width="100%"
+              height="100%"
+              paddingLeft="10"
+              paddingRight="10"
+              verticalAlign="middle">
+        
+        <s:Button id="newButton"
+                  width="25"
+                  height="25"
+                  icon="@Embed('../assets/new_file_icon.png')"
+                  skinClass="royalshield.components.skins.IconButtonSkin"/>
+        
+        <s:Button id="openButton"
+                  width="25"
+                  height="25"
+                  icon="@Embed('../assets/open_file_icon.png')"
+                  skinClass="royalshield.components.skins.IconButtonSkin"/>
+        
+        <s:Button id="saveButton"
+                  width="25"
+                  height="25"
+                  icon="@Embed('../assets/save_icon.png')"
+                  skinClass="royalshield.components.skins.IconButtonSkin"/>
+        
+        <s:Button id="saveAsButton"
+                  width="25"
+                  height="25"
+                  icon="@Embed('../assets/save_as_icon.png')"
+                  skinClass="royalshield.components.skins.IconButtonSkin"/>
+        <ide:ShadowLine height="60%"/>
+    </s:HGroup>
 </s:Group>
