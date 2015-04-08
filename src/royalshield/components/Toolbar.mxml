@@ -51,29 +51,37 @@
         <s:Button id="newButton"
                   width="25"
                   height="25"
+                  toolTip="New"
                   icon="@Embed('../assets/new_file_icon.png')"
                   skinClass="royalshield.components.skins.IconButtonSkin"/>
         
         <s:Button id="openButton"
                   width="25"
                   height="25"
+                  toolTip="Open"
                   icon="@Embed('../assets/open_file_icon.png')"
                   skinClass="royalshield.components.skins.IconButtonSkin"/>
         
         <s:Button id="saveButton"
                   width="25"
                   height="25"
+                  toolTip="Save"
+                  enabled="false"
                   icon="@Embed('../assets/save_icon.png')"
                   skinClass="royalshield.components.skins.IconButtonSkin"/>
         
         <s:Button id="saveAsButton"
                   width="25"
                   height="25"
+                  toolTip="Save As"
+                  enabled="false"
                   icon="@Embed('../assets/save_as_icon.png')"
                   skinClass="royalshield.components.skins.IconButtonSkin"/>
         
         <ide:ShadowLine height="60%"/>
         
         <ide:HistoryControl id="historyControl"/>
+        
+        <ide:ShadowLine height="60%"/>
     </s:HGroup>
 </s:Group>

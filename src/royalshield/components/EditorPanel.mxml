@@ -4,6 +4,7 @@
                    xmlns:s="library://ns.adobe.com/flex/spark"
                    xmlns:mx="library://ns.adobe.com/flex/mx"
                    xmlns:ide="royalshield.components.*"
+                   implements="mx.managers.IFocusManagerComponent"
                    backgroundColor="0x000000"
                    borderColor="0x000000"
                    creationComplete="creationCompleteHandler(event)">
@@ -93,6 +94,11 @@
                     m_map.setPosition(Math.min(horizontalScrollBar.maximum, m_map.x + 1), m_map.y, m_map.z);
             }
             
+            public function onCentralizeMap():void
+            {
+                if (m_map)
+                    m_map.setPosition(uint(horizontalScrollBar.maximum * 0.5), uint(verticalScrollBar.maximum * 0.5), m_map.z);
+            }
             
             //--------------------------------------
             // Private
@@ -167,6 +173,31 @@
                     m_timer.start();
             }
             
+            override protected function keyDownHandler(event:KeyboardEvent):void
+            {
+                var keyCode:uint = event.keyCode;
+                if (!event.controlKey && !event.shiftKey) {
+                    switch(keyCode)
+                    {
+                        case Keyboard.UP:
+                            this.onMoveMapNorth();
+                            break;
+                        
+                        case Keyboard.DOWN:
+                            this.onMoveMapSouth();
+                            break;
+                        
+                        case Keyboard.LEFT:
+                            this.onMoveMapWest();
+                            break;
+                        
+                        case Keyboard.RIGHT:
+                            this.onMoveMapEast();
+                            break;
+                    }
+                }
+            }
+            
         ]]>
     </fx:Script>
     
@@ -189,4 +220,13 @@
                   height="100%"
                   right="0"
                   bottom="17"/>
+    
+    <s:Button id="centralizeButton"
+              width="18"
+              height="18"
+              right="0"
+              bottom="0"
+              toolTip="Centralize"
+              icon="@Embed('../assets/centralize_icon.png')"
+              click="onCentralizeMap();"/>
 </s:BorderContainer>

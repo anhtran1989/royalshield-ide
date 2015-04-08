@@ -99,6 +99,15 @@ package royalshield.components
             }
         }
         
+        public function get showGrid():Boolean { return m_showGrid; }
+        public function set showGrid(value:Boolean):void
+        {
+            if (m_showGrid != value) {
+                m_showGrid = value;
+                invalidateDisplayList();
+            }
+        }
+        
         public function get onMouseMapChanged():Signal { return m_mouseMapChanged; }
         
         //--------------------------------------------------------------------------
@@ -166,8 +175,7 @@ package royalshield.components
             graphics.drawRect(0, 0, w, h);
             graphics.endFill();
             
-            if (m_showGrid)
-                drawGrid(w, h);
+            drawGrid(w, h);
         }
         
         //--------------------------------------
@@ -215,18 +223,19 @@ package royalshield.components
         
         private function drawGrid(width:Number, height:Number):void
         {
-            var size:Number = GameConsts.VIEWPORT_TILE_SIZE * m_zoom;
             var g:Graphics = m_gridSurface.graphics;
             g.clear();
-            g.lineStyle(0.5, 0x000000, 0.1);
-            
-            for (var x:int = 0; x < m_viewportX; x++) {
-                for (var y:int = 0; y < m_viewportY; y++) {
-                    g.drawRect(x * size, y * size, size, size);
+            if (m_showGrid) {
+                var size:Number = GameConsts.VIEWPORT_TILE_SIZE * m_zoom;
+                
+                g.lineStyle(0.5, 0x000000, 0.1);
+                for (var x:int = 0; x < m_viewportX; x++) {
+                    for (var y:int = 0; y < m_viewportY; y++) {
+                        g.drawRect(x * size, y * size, size, size);
+                    }
                 }
+                g.endFill();
             }
-            
-            g.endFill();
         }
         
         private function refreshMouseMap():void

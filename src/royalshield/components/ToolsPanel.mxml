@@ -5,7 +5,8 @@
                    xmlns:mx="library://ns.adobe.com/flex/mx"
                    xmlns:ide="royalshield.components.*"
                    backgroundColor="0x494949"
-                   borderColor="0x000000">
+                   borderColor="0x000000"
+                   creationComplete="creationCompleteHandler(event)">
     
     <fx:Metadata>
         [Event(name="brushChange", type="royalshield.events.BrushEvent")]
@@ -13,8 +14,12 @@
     
     <fx:Script>
         <![CDATA[
+            import mx.core.FlexGlobals;
+            import mx.events.FlexEvent;
+            
             import royalshield.brushes.BrushType;
             import royalshield.components.BrushButton;
+            import royalshield.core.IRoyalShieldIDE;
             import royalshield.events.BrushEvent;
             import royalshield.utils.isNullOrEmpty;
             
@@ -22,6 +27,7 @@
             // PROPERTIES
             //--------------------------------------------------------------------------
             
+            private var m_application:IRoyalShieldIDE;
             private var m_selectedType:String;
             
             //--------------------------------------
@@ -70,6 +76,13 @@
             // Event Handlers
             //--------------------------------------
             
+            protected function creationCompleteHandler(event:FlexEvent):void
+            {
+                m_application = IRoyalShieldIDE(FlexGlobals.topLevelApplication);
+                m_application.removeEventListener(FlexEvent.CREATION_COMPLETE, creationCompleteHandler);
+                m_application.systemManager.stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler);
+            }
+            
             protected function buttonClickHandler(event:Event):void
             {
                 var type:String = BrushButton(event.target).brushType;
@@ -78,6 +91,24 @@
                 else 
                     selectedType = type;
             }
+            
+            override protected function keyDownHandler(event:KeyboardEvent):void
+            {
+                var keyCode:uint = event.keyCode;
+                if (!event.ctrlKey && !event.shiftKey) {
+                    switch(keyCode)
+                    {
+                        case Keyboard.B:
+                            this.selectedType = BrushType.BRUSH;
+                            break;
+                        
+                        case Keyboard.E:
+                            this.selectedType = BrushType.ERASER;
+                            break;
+                    }
+                }
+            }
+            
         ]]>
     </fx:Script>
     
@@ -86,22 +117,25 @@
                           paddingRight="3"
                           paddingTop="5"
                           paddingBottom="5"
-                          gap="5"/>
+                          gap="5"
+                          horizontalAlign="center"/>
     </s:layout>
     
     <ide:BrushButton id="brushButton"
-                     width="100%"
+                     width="30"
                      height="30"
                      label="B"
                      toolTip="Brush (B)"
                      brushType="{BrushType.BRUSH}"
+                     icon="@Embed('../assets/brush_icon.png')"
                      click="buttonClickHandler(event)"/>
     
     <ide:BrushButton id="eraseButton"
-                     width="100%"
+                     width="30"
                      height="30"
                      label="E"
                      toolTip="Erase (E)"
                      brushType="{BrushType.ERASER}"
+                     icon="@Embed('../assets/eraser_icon.png')"
                      click="buttonClickHandler(event)"/>
 </s:BorderContainer>

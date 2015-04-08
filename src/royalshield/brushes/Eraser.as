@@ -13,6 +13,7 @@ package royalshield.brushes
     import royalshield.history.HistoryActionGroup;
     import royalshield.history.MapHistoryAction;
     import royalshield.history.RSHistoryManager;
+    import royalshield.utils.StringUtil;
     import royalshield.world.Tile;
     
     public class Eraser implements IBrush
@@ -103,7 +104,8 @@ package royalshield.brushes
             
             var length:uint = m_actions.length;
             if (length > 0) {
-                var actionGroup:HistoryActionGroup = new HistoryActionGroup("Remove");
+                var description:String = StringUtil.format("Removed {0} item{1}", length, length > 1 ? "s" : "");
+                var actionGroup:HistoryActionGroup = new HistoryActionGroup(description);
                 
                 for (var i:int = 0; i < length; i++)
                     actionGroup.addAction(m_actions[i]);

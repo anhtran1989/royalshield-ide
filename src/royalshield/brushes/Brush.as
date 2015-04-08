@@ -17,6 +17,7 @@ package royalshield.brushes
     import royalshield.history.HistoryActionGroup;
     import royalshield.history.MapHistoryAction;
     import royalshield.history.RSHistoryManager;
+    import royalshield.utils.StringUtil;
     import royalshield.world.Tile;
     
     use namespace mx_internal;
@@ -115,7 +116,9 @@ package royalshield.brushes
             
             var length:uint = m_actions.length;
             if (length > 0) {
-                var actionGroup:HistoryActionGroup = new HistoryActionGroup("Add");
+                var description:String = StringUtil.format("Added {0} item{1} id {2}", length, length > 1 ? "s" : "", m_itemId);
+                var actionGroup:HistoryActionGroup = new HistoryActionGroup(description);
+                
                 for (var i:int = 0; i < length; i++)
                     actionGroup.addAction(m_actions[i]);
                 
