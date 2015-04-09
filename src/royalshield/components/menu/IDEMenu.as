@@ -84,6 +84,15 @@ package royalshield.components.menu
             fileNewProjectMenu.controlKey = true;
             fileNewMenu.addMenuItem(fileNewProjectMenu);
             
+            // Separator
+            fileNewMenu.addMenuItem(separator);
+            
+            // File > New... > Map
+            var fileNewMapMenu:MenuItem = new MenuItem();
+            fileNewMapMenu.label = "Map";
+            fileNewMapMenu.data = FILE_NEW_MAP;
+            fileNewMenu.addMenuItem(fileNewMapMenu);
+            
             // File > Open
             var fileOpenMenu:MenuItem = new MenuItem();
             fileOpenMenu.label = "Open";
@@ -220,10 +229,10 @@ package royalshield.components.menu
             nativeMenu.items[index].submenu.items[3].enabled = false;
             
             // menu Edit > Undo
-            nativeMenu.items[(index + 1)].submenu.items[0].enabled = m_application.historyManager.canUndo;
+            nativeMenu.items[(index + 1)].submenu.items[0].enabled = m_application.editorManager.canUndo;
             
             // menu Edit > Redo
-            nativeMenu.items[(index + 1)].submenu.items[1].enabled = m_application.historyManager.canRedo;
+            nativeMenu.items[(index + 1)].submenu.items[1].enabled = m_application.editorManager.canRedo;
             
             // menu View > Zoom in
             nativeMenu.items[(index + 2)].submenu.items[0].enabled = false;
@@ -232,7 +241,7 @@ package royalshield.components.menu
             nativeMenu.items[(index + 2)].submenu.items[1].enabled = false;
             
             // menu View > Show Grid
-            nativeMenu.items[(index + 2)].submenu.items[3].checked = m_application.showGrid;
+            nativeMenu.items[(index + 2)].submenu.items[3].checked = m_application.editorManager.showGrid;
         }
         
         //--------------------------------------------------------------------------
@@ -240,6 +249,7 @@ package royalshield.components.menu
         //--------------------------------------------------------------------------
         
         static public const FILE_NEW_PROJECT:String = "fileNewProject";
+        static public const FILE_NEW_MAP:String = "fileNewMap";
         static public const FILE_OPEN:String = "fileOpen";
         static public const FILE_SAVE:String = "fileSave";
         static public const FILE_SAVE_AS:String = "fileSaveAs";

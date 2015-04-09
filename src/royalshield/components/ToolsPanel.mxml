@@ -5,7 +5,7 @@
                    xmlns:mx="library://ns.adobe.com/flex/mx"
                    xmlns:ide="royalshield.components.*"
                    backgroundColor="0x494949"
-                   borderColor="0x000000"
+                   borderColor="0x272727"
                    creationComplete="creationCompleteHandler(event)">
     
     <fx:Metadata>

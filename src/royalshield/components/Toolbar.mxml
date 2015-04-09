@@ -10,7 +10,15 @@
         <![CDATA[
             import mx.events.FlexEvent;
             
-            import royalshield.history.RSHistoryManager;
+            import royalshield.edition.EditorManager;
+            import royalshield.edition.IEditorManager;
+            import royalshield.events.EditorManagerEvent;
+            
+            //--------------------------------------------------------------------------
+            // PROPERTIES
+            //--------------------------------------------------------------------------
+            
+            private var m_editorManager:IEditorManager;
             
             //--------------------------------------------------------------------------
             // METHODS
@@ -22,7 +30,15 @@
             
             protected function creationCompleteHandler(event:FlexEvent):void
             {
-                historyControl.historyManager = RSHistoryManager.getInstance();
+                m_editorManager = EditorManager.getInstance();
+                m_editorManager.addEventListener(EditorManagerEvent.EDITOR_CREATED, editorManagerHandler);
+                m_editorManager.addEventListener(EditorManagerEvent.EDITOR_CHANGED, editorManagerHandler);
+                m_editorManager.addEventListener(EditorManagerEvent.EDITOR_REMOVED, editorManagerHandler);
+            }
+            
+            protected function editorManagerHandler(event:EditorManagerEvent):void
+            {
+                historyControl.historyManager = m_editorManager.currentHistoryManager;
             }
             
         ]]>

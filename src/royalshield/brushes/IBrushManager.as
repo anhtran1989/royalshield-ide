@@ -8,6 +8,12 @@ package royalshield.brushes
     
     public interface IBrushManager extends IEventDispatcher
     {
+        function get target():IDrawingTarget;
+        function set target(value:IDrawingTarget):void;
+        
+        function get isOver():Boolean;
+        function set isOver(value:Boolean):void;
+        
         function get brushType():String;
         function set brushType(value:String):void;
         
@@ -17,9 +23,8 @@ package royalshield.brushes
         function get cursorManager():ICursorManager;
         function set cursorManager(value:ICursorManager):void;
         
-        function doPress(target:IDrawingTarget, x:uint, y:uint):void;
+        function doPress(x:uint, y:uint):void;
         function doDrag(x:uint, y:uint):void;
-        function doMove(x:uint, y:uint):void;
         function doRelease(x:uint, y:uint):void;
         
         function showCursor():void;

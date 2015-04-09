@@ -42,7 +42,8 @@ package royalshield.components
         { 
            if (m_historyManager != value) {
                if (m_historyManager) {
-                   m_historyManager.removeEventListener(HistoryEvent.LIST_CHANGE, historyManagerChanged);
+                   m_historyManager.removeEventListener(HistoryEvent.LIST_CHANGE, historyManagerChangeHandler);
+                   m_historyManager.removeEventListener(HistoryEvent.DISPOSE, historyManagerDisposeHandler);
                    m_historyManager = null;
                }
                m_historyManager = value;
@@ -110,14 +111,14 @@ package royalshield.components
         
         private function setHistoryManager(historyManager:IHistoryManager):void
         {
-            if (!historyManager) {
+            if (historyManager) {
+                historyManager.addEventListener(HistoryEvent.LIST_CHANGE, historyManagerChangeHandler);
+                historyManager.addEventListener(HistoryEvent.DISPOSE, historyManagerDisposeHandler);
+                updateHistoryLists();
+            } else {
                 m_redoCollection.removeAll();
                 m_undoCollection.removeAll();
-                return;
             }
-            
-            historyManager.addEventListener(HistoryEvent.LIST_CHANGE, historyManagerChanged);
-            updateHistoryLists();
         }
         
         protected function updateHistoryLists():void
@@ -144,9 +145,14 @@ package royalshield.components
         // Event Handlers
         //--------------------------------------
         
-        protected function historyManagerChanged(event:HistoryEvent):void
+        protected function historyManagerChangeHandler(event:HistoryEvent):void
         {
             updateHistoryLists();
+        }
+        
+        protected function historyManagerDisposeHandler(event:HistoryEvent):void
+        {
+            this.historyManager = null;
         }
         
         protected function undoButtonClickHandler(event:MouseEvent):void

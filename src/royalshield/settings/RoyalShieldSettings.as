@@ -6,7 +6,7 @@ package royalshield.settings
         // PROPERTIES
         //--------------------------------------------------------------------------
         
-        public var maximized:Boolean;
+        public var maximized:Boolean = true;
         
         //--------------------------------------------------------------------------
         // CONSTRUCTOR

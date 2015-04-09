@@ -8,6 +8,7 @@ package royalshield.history
     import royalshield.utils.IDisposable;
     
     [Event(name="listChange", type="royalshield.events.HistoryEvent")]
+    [Event(name="dispose", type="royalshield.events.HistoryEvent")]
     
     public class HistoryManager extends EventDispatcher implements IHistoryManager, IDisposable
     {
@@ -89,6 +90,9 @@ package royalshield.history
         {
             m_collection.dispose();
             m_collection = new HistoryActionCollection(m_maxLength);
+            
+            if (hasEventListener(HistoryEvent.DISPOSE))
+                dispatchEvent(new HistoryEvent(HistoryEvent.DISPOSE));
         }
         
         //--------------------------------------

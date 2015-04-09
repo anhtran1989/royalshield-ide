@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<s:Panel xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark"
+         xmlns:mx="library://ns.adobe.com/flex/mx"
+         xmlns:ide="royalshield.components.*"
+         minWidth="250"
+         maxWidth="550"
+         minHeight="100"
+         backgroundColor="0x494949"
+         creationComplete="creationCompleteHandler(event)">
+    
+    <fx:Script>
+        <![CDATA[
+            import mx.core.FlexGlobals;
+            import mx.events.CloseEvent;
+            import mx.events.FlexEvent;
+            import mx.managers.PopUpManager;
+            import mx.resources.IResourceManager;
+            import mx.resources.ResourceManager;
+            
+            import spark.components.Button;
+            
+            public var buttonFlags:uint = OK;
+            public var focusFlags:uint = 0;
+            
+            [Bindable]
+            public var text:String = "";
+            
+            public var iconClass:Class;
+            
+            private var m_focusedButton:Button;
+            
+            //--------------------------------------
+            // Private
+            //--------------------------------------
+            
+            private function createButton(label:String, name:String):Button
+            {
+                var button:Button = new Button();
+                button.label = label;
+                button.name  = name;
+                button.minWidth = buttonWidth
+                button.minHeight = buttonHeight;
+                return button;
+            }
+            
+            private function removeAlert(button:Button = null):void
+            {
+                var closeEvent:CloseEvent = new CloseEvent(CloseEvent.CLOSE);
+                
+                if (button) {
+                    switch (button.name)
+                    {
+                        case "YES":
+                            closeEvent.detail = Alert.YES;
+                            break;
+                            
+                        case "YES_TO_ALL":
+                            closeEvent.detail = Alert.YES_TO_ALL;
+                            break;
+                            
+                        case "NO":
+                            closeEvent.detail = Alert.NO;
+                            break;
+                            
+                        case "OK":
+                            closeEvent.detail = Alert.OK;
+                            break;
+                            
+                        case "CANCEL":
+                            closeEvent.detail = Alert.CANCEL;
+                            break;
+                    }
+                }
+                
+                dispatchEvent(closeEvent);
+                PopUpManager.removePopUp(this);
+            }
+            
+            //--------------------------------------
+            // Override Protected
+            //--------------------------------------
+            
+            override protected function createChildren():void
+            {
+                var label:String;
+                var button:Button;
+                
+                super.createChildren();
+                
+                if (buttonFlags & YES) {
+                    label  = yesLabel;
+                    button = createButton(label, "YES");
+                    button.addEventListener(MouseEvent.CLICK, buttonClickHandler);
+                    button.addEventListener(KeyboardEvent.KEY_DOWN, buttonKeyDownHandler);
+                    buttonsGroup.addElement(button);
+                    
+                    if (focusFlags & YES)
+                        m_focusedButton = button;
+                }
+                
+                if (buttonFlags & YES_TO_ALL) {
+                    label  = yesToAllLabel;
+                    button = createButton(label, "YES_TO_ALL");
+                    button.addEventListener(MouseEvent.CLICK, buttonClickHandler);
+                    button.addEventListener(KeyboardEvent.KEY_DOWN, buttonKeyDownHandler);
+                    buttonsGroup.addElement(button);
+                    
+                    if (focusFlags & YES_TO_ALL)
+                        m_focusedButton = button;
+                }
+                
+                if (buttonFlags & NO) {
+                    label  = noLabel;
+                    button = createButton(label, "NO");
+                    button.addEventListener(MouseEvent.CLICK, buttonClickHandler);
+                    button.addEventListener(KeyboardEvent.KEY_DOWN, buttonKeyDownHandler);
+                    buttonsGroup.addElement(button);
+                    
+                    if (focusFlags & NO)
+                        m_focusedButton = button;
+                }
+                
+                if (buttonFlags & OK) {
+                    label  = okLabel;
+                    button = createButton(label, "OK");
+                    button.addEventListener(MouseEvent.CLICK, buttonClickHandler);
+                    button.addEventListener(KeyboardEvent.KEY_DOWN, buttonKeyDownHandler);
+                    buttonsGroup.addElement(button);
+                    
+                    if (focusFlags & OK)
+                        m_focusedButton = button;
+                }
+                
+                if (buttonFlags & CANCEL) {
+                    label  = cancelLabel;
+                    button = createButton(label, "CANCEL");
+                    button.addEventListener(MouseEvent.CLICK, buttonClickHandler);
+                    button.addEventListener(KeyboardEvent.KEY_DOWN, buttonKeyDownHandler);
+                    buttonsGroup.addElement(button);
+                    
+                    if (focusFlags & CANCEL)
+                        m_focusedButton = button;
+                }
+            }
+            
+            //--------------------------------------
+            // Event Handlers
+            //--------------------------------------
+            
+            protected function creationCompleteHandler(event:FlexEvent):void
+            {
+                if (m_focusedButton)
+                {
+                    focusManager.setFocus(m_focusedButton);
+                    focusManager.showFocus();
+                    m_focusedButton = null;
+                }
+            }
+            
+            protected function buttonClickHandler(event:MouseEvent):void
+            {
+                removeAlert(Button(event.target));
+            }
+            
+            protected function buttonKeyDownHandler(event:KeyboardEvent):void
+            {
+                if (event.keyCode == Keyboard.ESCAPE)
+                    removeAlert(Button(event.target));
+            }
+            
+            //--------------------------------------------------------------------------
+            //
+            // STATIC
+            //
+            //--------------------------------------------------------------------------
+            
+            static public var buttonHeight:Number = 22;
+            static public var buttonWidth:Number = 65;
+            
+            static private var s_resourceManager:IResourceManager;
+            static private var s_initialized:Boolean;
+            static private var s_cancelLabel:String;
+            static private var s_noLabel:String;
+            static private var s_okLabel:String;
+            static private var s_yesLabel:String;
+            static private var s_yesToAllLabel:String;
+            static private var s_cancelLabelOverride:String;
+            static private var s_noLabelOverride:String;
+            static private var s_okLabelOverride:String;
+            static private var s_yesLabelOverride:String;
+            static private var s_yesToAllLabelOverride:String;
+            
+            static public const YES:uint = 0x0001;
+            static public const YES_TO_ALL:uint = 0x0002;
+            static public const NO:uint = 0x0004;
+            static public const OK:uint = 0x0008;
+            static public const CANCEL:uint = 0x0010;
+            static public const NONMODAL:uint = 0x8000;
+            
+            static public function show(text:String = "",
+                                        title:String = "",
+                                        flags:uint = 0x0008,
+                                        parent:Sprite = null,
+                                        closeHandler:Function = null, 
+                                        iconClass:Class = null,
+                                        focusFlags:uint = 0):Alert
+            {
+                var alert:Alert = new Alert();
+                alert.text = text;
+                alert.title = title;
+                alert.iconClass = iconClass;
+                
+                if ((flags & YES) ||
+                    (flags & YES_TO_ALL) ||
+                    (flags & NO) ||
+                    (flags & OK) ||
+                    (flags & CANCEL))
+                {
+                    alert.buttonFlags = flags;
+                }
+                
+                if ((focusFlags & YES) ||
+                    (focusFlags & YES_TO_ALL) ||
+                    (focusFlags & NO) ||
+                    (focusFlags & OK) ||
+                    (focusFlags & CANCEL))
+                {
+                    alert.focusFlags = focusFlags;
+                }
+                
+                if (closeHandler != null)
+                    alert.addEventListener(CloseEvent.CLOSE, closeHandler);
+                
+                if (!parent)
+                    parent = Sprite(FlexGlobals.topLevelApplication);
+                
+                var modal:Boolean = (flags & Alert.NONMODAL) ? false : true;
+                
+                PopUpManager.addPopUp(alert, parent, modal);
+                PopUpManager.centerPopUp(alert);
+                return alert;
+            }
+            
+            static private function initialize():void
+            {
+                if (!s_initialized) {
+                    resourceManager.addEventListener(Event.CHANGE, resourceManagerChangeHandler, false, 0, true);
+                    resourcesChanged();
+                    s_initialized = true;
+                }
+            }
+            
+            static private function resourcesChanged():void
+            {
+                yesLabel = s_yesLabelOverride;
+                yesToAllLabel = s_yesToAllLabelOverride;
+                noLabel = s_noLabelOverride;
+                okLabel = s_okLabelOverride;
+                cancelLabel = s_cancelLabelOverride;
+            }
+            
+            static private function resourceManagerChangeHandler(event:Event):void
+            {
+                resourcesChanged();
+            }
+            
+            static public function get yesLabel():String
+            {
+                initialize();
+                return s_yesLabel;
+            }
+            
+            static public function set yesLabel(value:String):void
+            {
+                s_yesLabelOverride = value;
+                s_yesLabel = value != null ? value : resourceManager.getString("strings", "yes");
+            }
+            
+            static public function get yesToAllLabel():String
+            {
+                initialize();
+                return s_yesToAllLabel;
+            }
+            
+            static public function set yesToAllLabel(value:String):void
+            {
+                s_yesToAllLabelOverride = value;
+                s_yesToAllLabel = value != null ? value : resourceManager.getString("strings", "yesToAll");
+            }
+            
+            static public function get noLabel():String
+            {
+                initialize();
+                return s_noLabel;
+            }
+            
+            static public function set noLabel(value:String):void
+            {
+                s_noLabelOverride = value;
+                s_noLabel = value != null ? value : resourceManager.getString("strings", "no");
+            }
+            
+            static public function get okLabel():String
+            {
+                initialize();
+                return s_okLabel;
+            }
+            
+            static public function set okLabel(value:String):void
+            {
+                s_okLabelOverride = value;
+                s_okLabel = value != null ? value : resourceManager.getString("strings", "ok");
+            }
+            
+            static public function get cancelLabel():String
+            {
+                initialize();
+                return s_cancelLabel;
+            }
+            
+            static public function set cancelLabel(value:String):void
+            {
+                s_cancelLabelOverride = value;
+                s_cancelLabel = value != null ? value : resourceManager.getString("strings", "cancel");
+            }
+            
+            static private function get resourceManager():IResourceManager
+            {
+                if (!s_resourceManager)
+                    s_resourceManager = ResourceManager.getInstance();
+                
+                return s_resourceManager;
+            }
+            
+        ]]>
+    </fx:Script>
+    
+    <s:VGroup width="100%"
+              height="100%"
+              paddingLeft="10"
+              paddingRight="10"
+              paddingTop="20"
+              paddingBottom="10"
+              verticalAlign="middle"
+              horizontalAlign="center">
+        
+        <!--- @private -->
+        <s:RichEditableText id="textDisplay"
+                            minHeight="30"
+                            maxWidth="350"
+                            maxHeight="400"
+                            text="{text}"
+                            editable="false"
+                            focusEnabled="false"
+                            color="0xDFDFDF"
+                            fontSize="11"
+                            focusedTextSelectionColor="0x444444"/>
+        
+        <ide:ShadowLine width="100%"/>
+        
+        <s:HGroup id="buttonsGroup"
+                  width="100%"
+                  horizontalAlign="center"/>
+    </s:VGroup>
+</s:Panel>

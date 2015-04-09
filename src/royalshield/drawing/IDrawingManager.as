@@ -7,5 +7,6 @@ package royalshield.drawing
         function get currentTarget():IDrawingTarget;
         
         function addTarget(target:IDrawingTarget):void;
+        function removeTarget(target:IDrawingTarget):void;
     }
 }

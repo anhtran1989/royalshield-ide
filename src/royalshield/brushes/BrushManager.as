@@ -18,6 +18,8 @@ package royalshield.brushes
         // PROPERTIES
         //--------------------------------------------------------------------------
         
+        private var m_target:IDrawingTarget;
+        private var m_isOver:Boolean;
         private var m_brushType:String;
         private var m_brush:IBrush;
         private var m_itemId:uint;
@@ -25,8 +27,14 @@ package royalshield.brushes
         private var m_cursorManager:ICursorManager;
         
         //--------------------------------------
-        // Getters / Setters 
+        // Getters / Setters
         //--------------------------------------
+        
+        public function get target():IDrawingTarget { return m_target; }
+        public function set target(value:IDrawingTarget):void { m_target = value; }
+        
+        public function get isOver():Boolean { return m_isOver; }
+        public function set isOver(value:Boolean):void { m_isOver = value; }
         
         public function get brushType():String { return m_brushType; }
         public function set brushType(value:String):void
@@ -73,16 +81,10 @@ package royalshield.brushes
         // Public
         //--------------------------------------
         
-        public function doPress(target:IDrawingTarget, x:uint, y:uint):void
-        {
-            if (target && m_brush)
-                m_brush.doPress(target, x, y);
-        }
-        
-        public function doMove(x:uint, y:uint):void
+        public function doPress(x:uint, y:uint):void
         {
             if (m_brush)
-                m_brush.doMove(x, y);
+                m_brush.doPress(x, y);
         }
         
         public function doDrag(x:uint, y:uint):void
@@ -138,7 +140,9 @@ package royalshield.brushes
                 m_brush.itemId = m_itemId;
                 m_brush.zoom = m_zoom;
                 m_brush.brushManager = this;
-                m_brush.showCursor();
+                
+                if (m_isOver)
+                    m_brush.showCursor();
             }
             
             dispatchEvent(new BrushEvent(BrushEvent.BRUSH_CHANGE, this.brushType));

@@ -5,7 +5,7 @@ package royalshield.core
     
     import royalshield.brushes.IBrushManager;
     import royalshield.drawing.IDrawingManager;
-    import royalshield.history.IHistoryManager;
+    import royalshield.edition.IEditorManager;
     import royalshield.settings.ISettingsManager;
     
     public interface IRoyalShieldIDE extends IUIComponent, IWindow
@@ -13,9 +13,8 @@ package royalshield.core
         function get settingsManager():ISettingsManager;
         function get brushManager():IBrushManager;
         function get drawingManager():IDrawingManager;
-        function get historyManager():IHistoryManager;
+        function get editorManager():IEditorManager;
         
-        function get showGrid():Boolean;
-        function set showGrid(value:Boolean):void;
+        function cancelClosing():void;
     }
 }

@@ -7,9 +7,12 @@ package royalshield.drawing
     import royalshield.brushes.IBrushManager;
     import royalshield.drawing.IDrawingManager;
     import royalshield.drawing.IDrawingTarget;
+    import royalshield.edition.EditorManager;
+    import royalshield.edition.IEditorManager;
     import royalshield.errors.NullArgumentError;
     import royalshield.errors.SingletonClassError;
     import royalshield.events.DrawingEvent;
+    import royalshield.events.EditorManagerEvent;
     
     public final class DrawingManager extends EventDispatcher implements IDrawingManager
     {
@@ -19,6 +22,7 @@ package royalshield.drawing
         
         private var m_currentTarget:IDrawingTarget;
         private var m_brushManager:IBrushManager;
+        private var m_editorManager:IEditorManager;
         
         //--------------------------------------
         // Getters / Setters
@@ -37,6 +41,10 @@ package royalshield.drawing
             
             s_instance = this;
             m_brushManager = BrushManager.getInstance();
+            m_editorManager = EditorManager.getInstance();
+            m_editorManager.addEventListener(EditorManagerEvent.EDITOR_CREATED, editorManagerCreatedHandler);
+            m_editorManager.addEventListener(EditorManagerEvent.EDITOR_CHANGED, editorManagerChangedHandler);
+            m_editorManager.addEventListener(EditorManagerEvent.EDITOR_REMOVED, editorManagerRemovedHandler);
         }
         
         //--------------------------------------------------------------------------
@@ -52,8 +60,24 @@ package royalshield.drawing
             if (!target)
                 throw new NullArgumentError("target");
             
-            m_currentTarget = target;
             addListeners(target);
+            setTarget(target);
+        }
+        
+        public function removeTarget(target:IDrawingTarget):void
+        {
+            if (target) {
+                if (m_currentTarget == target)
+                    setTarget(null);
+                
+                removeListeners(target);
+            }
+        }
+        
+        public function setTarget(target:IDrawingTarget):void
+        {
+            m_currentTarget = target;
+            m_brushManager.target = target;
         }
         
         //--------------------------------------
@@ -63,7 +87,6 @@ package royalshield.drawing
         private function addListeners(target:IDrawingTarget):void
         {
             target.addEventListener(DrawingEvent.BRUSH_PRESS, targetPressHandler);
-            target.addEventListener(DrawingEvent.BRUSH_MOVE, targetMoveHandler);
             target.addEventListener(DrawingEvent.BRUSH_DRAG, targetDragHandler);
             target.addEventListener(DrawingEvent.BRUSH_RELEASE, targetReleaseHandler);
             target.addEventListener(DrawingEvent.ZOOM, targetZoomChangeHandler);
@@ -74,7 +97,6 @@ package royalshield.drawing
         private function removeListeners(target:IDrawingTarget):void
         {
             target.removeEventListener(DrawingEvent.BRUSH_PRESS, targetPressHandler);
-            target.removeEventListener(DrawingEvent.BRUSH_MOVE, targetMoveHandler);
             target.removeEventListener(DrawingEvent.BRUSH_DRAG, targetDragHandler);
             target.removeEventListener(DrawingEvent.BRUSH_RELEASE, targetReleaseHandler);
             target.removeEventListener(DrawingEvent.ZOOM, targetZoomChangeHandler);
@@ -86,14 +108,24 @@ package royalshield.drawing
         // Event Handlers
         //--------------------------------------
         
-        private function targetPressHandler(event:DrawingEvent):void
+        private function editorManagerCreatedHandler(event:EditorManagerEvent):void
         {
-            m_brushManager.doPress(m_currentTarget, m_currentTarget.mouseDownX, m_currentTarget.mouseDownY);
+            addTarget(event.editor.display);
         }
         
-        private function targetMoveHandler(event:DrawingEvent):void
+        private function editorManagerChangedHandler(event:EditorManagerEvent):void
         {
-            m_brushManager.doMove(m_currentTarget.mouseMapX, m_currentTarget.mouseMapY);
+            setTarget(event.editor.display);
+        }
+        
+        private function editorManagerRemovedHandler(event:EditorManagerEvent):void
+        {
+            removeTarget(event.editor.display);
+        }
+        
+        private function targetPressHandler(event:DrawingEvent):void
+        {
+            m_brushManager.doPress(m_currentTarget.mouseDownX, m_currentTarget.mouseDownY);
         }
         
         private function targetDragHandler(event:DrawingEvent):void
@@ -113,11 +145,13 @@ package royalshield.drawing
         
         private function targetRollOverHandler(event:MouseEvent):void
         {
+            m_brushManager.isOver = true;
             m_brushManager.showCursor();
         }
         
         private function targetRollOutHandler(event:MouseEvent):void
         {
+            m_brushManager.isOver = false;
             m_brushManager.hideCursor();
         }
         

@@ -15,6 +15,7 @@ package royalshield.components
     import royalshield.entities.items.Item;
     import royalshield.events.DrawingEvent;
     import royalshield.signals.Signal;
+    import royalshield.utils.IDisposable;
     import royalshield.world.IWorldMap;
     import royalshield.world.Tile;
     
@@ -24,15 +25,14 @@ package royalshield.components
     [Event(name="brushRelease", type="royalshield.events.DrawingEvent")]
     [Event(name="zoom", type="royalshield.events.DrawingEvent")]
     
-    public class WorldMapDisplay extends UIComponent implements IDrawingTarget
+    public class WorldMapDisplay extends UIComponent implements IDrawingTarget, IDisposable
     {
         //--------------------------------------------------------------------------
         // PROPERTIES
         //--------------------------------------------------------------------------
         
-        public var editorPanel:EditorPanel;
+        public var editor:MapEditor;
         
-        private var m_canvas:GameCanvas;
         private var m_worldMap:IWorldMap;
         private var m_matrix:Matrix;
         private var m_viewportX:int;
@@ -118,21 +118,32 @@ package royalshield.components
         {
             super();
             
-            m_canvas = new GameCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
             m_matrix = new Matrix();
-            m_showGrid = true;
             m_zoom = 1.0;
             
             m_mouseMapChanged = new Signal();
             
-            addEventListener(MouseEvent.MOUSE_DOWN, mouseDownHandler);
-            addEventListener(MouseEvent.MOUSE_MOVE, mouseMoveHandler);
-            addEventListener(MouseEvent.MOUSE_UP, mouseUpHandler);
+            this.addEventListener(MouseEvent.MOUSE_DOWN, mouseDownHandler);
+            this.addEventListener(MouseEvent.MOUSE_MOVE, mouseMoveHandler);
+            this.addEventListener(MouseEvent.MOUSE_UP, mouseUpHandler);
         }
         
         //--------------------------------------------------------------------------
         // METHODS
         //--------------------------------------------------------------------------
+        
+        //--------------------------------------
+        // Public
+        //--------------------------------------
+        
+        public function dispose():void
+        {
+            this.worldMap = null;
+            this.removeEventListener(MouseEvent.MOUSE_DOWN, mouseDownHandler);
+            this.removeEventListener(MouseEvent.MOUSE_MOVE, mouseMoveHandler);
+            this.removeEventListener(MouseEvent.MOUSE_UP, mouseUpHandler);
+            this.onMouseMapChanged.removeAll();
+        }
         
         //--------------------------------------
         // Override Protected
@@ -163,15 +174,16 @@ package royalshield.components
             m_matrix.a = m_zoom;
             m_matrix.d = m_zoom;
             
-            m_canvas.lock();
-            m_canvas.erase();
+            CANVAS.lock();
+            CANVAS.erase();
             
-            drawTiles(m_worldMap.z);
+            for (var z:uint = 0; z <= m_worldMap.z; z++)
+                drawTiles(z);
             
-            m_canvas.unlock();
+            CANVAS.unlock();
             
             graphics.clear();
-            graphics.beginBitmapFill(m_canvas, m_matrix, false, true);
+            graphics.beginBitmapFill(CANVAS, m_matrix, false, true);
             graphics.drawRect(0, 0, w, h);
             graphics.endFill();
             
@@ -217,7 +229,7 @@ package royalshield.components
             for (var i:int = 0; i < length; i++) {
                 item = tile.getItemAt(i);
                 if (item)
-                    item.render(m_canvas, tileOffsetX, tileOffsetY, tx, ty, z);
+                    item.render(CANVAS, tileOffsetX, tileOffsetY, tx, ty, z);
             }
         }
         
@@ -249,7 +261,7 @@ package royalshield.components
             if (posy < 0 || posy > m_viewportY)
                 return;
             
-            var scrollPoint:Point = editorPanel.scrollPoint;
+            var scrollPoint:Point = editor.scrollPoint;
             var x:uint = scrollPoint.x + posx;
             var y:uint = scrollPoint.y + posy;
             var z:uint = m_worldMap.z;
@@ -291,7 +303,6 @@ package royalshield.components
         protected function mouseMoveHandler(event:MouseEvent):void
         {
             refreshMouseMap();
-            dispatchEvent(new DrawingEvent(DrawingEvent.BRUSH_MOVE));
             
             if (m_mouseDown)
                 dispatchEvent(new DrawingEvent(DrawingEvent.BRUSH_DRAG));
@@ -313,10 +324,10 @@ package royalshield.components
         // STATIC
         //--------------------------------------------------------------------------
         
-        public static const CANVAS_WIDTH:uint = 1024;
-        public static const CANVAS_HEIGHT:uint = 1024;
-        
-        private static const MIN_ZOOM:Number = 1.0;
-        private static const MAX_ZOOM:Number = 3.0;
+        static private const MIN_ZOOM:Number = 1.0;
+        static private const MAX_ZOOM:Number = 3.0;
+        static private const CANVAS_WIDTH:uint = 1024;
+        static private const CANVAS_HEIGHT:uint = 1024;
+        static private const CANVAS:GameCanvas = new GameCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
     }
 }

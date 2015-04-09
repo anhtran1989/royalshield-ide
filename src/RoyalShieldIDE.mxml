@@ -11,7 +11,8 @@
                        showStatusBar="false"
                        backgroundColor="0x494949"
                        preinitialize="applicationPreinitializeHandler(event)"
-                       creationComplete="applicationCreationCompleteHandler(event)" >
+                       creationComplete="applicationCreationCompleteHandler(event)"
+                       closing="windowedApplicationClosingHandler(event)">
     
     <fx:Style source="royal_shield.css"/>
     
@@ -21,19 +22,18 @@
             
             import royalshield.brushes.BrushManager;
             import royalshield.brushes.IBrushManager;
+            import royalshield.components.Alert;
             import royalshield.drawing.DrawingManager;
             import royalshield.drawing.IDrawingManager;
+            import royalshield.edition.EditorManager;
+            import royalshield.edition.IEditorManager;
             import royalshield.events.BrushEvent;
+            import royalshield.events.MapPositionEvent;
             import royalshield.events.MenuEvent;
-            import royalshield.history.HistoryActionGroup;
-            import royalshield.history.IHistoryManager;
-            import royalshield.history.RSHistoryManager;
             import royalshield.settings.ISettingsManager;
             import royalshield.settings.RoyalShieldSettings;
             import royalshield.settings.SettingsManager;
             import royalshield.utils.DescriptorUtil;
-            import royalshield.world.IWorldMap;
-            import royalshield.world.WorldMap;
             
             //--------------------------------------------------------------------------
             // PROPERTIES
@@ -43,33 +43,29 @@
             private var m_settings:RoyalShieldSettings;
             private var m_brushManager:IBrushManager;
             private var m_drawingManager:IDrawingManager;
-            private var m_historyManager:IHistoryManager;
-            private var m_worldMap:IWorldMap;
-            private var m_showGrid:Boolean;
+            private var m_editorManager:IEditorManager;
             
             //--------------------------------------
-            // Getters / Setters 
+            // Getters / Setters
             //--------------------------------------
             
             public function get settingsManager():ISettingsManager { return m_settingsManager; }
             public function get brushManager():IBrushManager { return m_brushManager; }
             public function get drawingManager():IDrawingManager { return m_drawingManager; }
-            public function get historyManager():IHistoryManager { return m_historyManager; }
-            
-            public function get showGrid():Boolean { return m_showGrid; }
-            public function set showGrid(value:Boolean):void
-            {
-                if (m_showGrid != value) {
-                    m_showGrid = value;
-                    
-                    if (editorPanel && editorPanel.mapDisplay)
-                        editorPanel.mapDisplay.showGrid = m_showGrid;
-                }
-            }
+            public function get editorManager():IEditorManager { return m_editorManager; }
             
             //--------------------------------------------------------------------------
             // METHODS
             //--------------------------------------------------------------------------
+            
+            //--------------------------------------
+            // Public
+            //--------------------------------------
+            
+            public function cancelClosing():void
+            {
+                
+            }
             
             //--------------------------------------
             // Private
@@ -81,13 +77,16 @@
                 m_settingsManager.loadSettings(m_settings);
             }
             
-            private function test():void
+            private function saveSettings():void
             {
-                m_worldMap = new WorldMap();
-                editorPanel.worldMap = m_worldMap;
-                editorPanel.mapDisplay.onMouseMapChanged.add(mouseMapChangedCallback);
-                m_drawingManager.addTarget(editorPanel.mapDisplay);
-                RSHistoryManager(m_historyManager).map = m_worldMap;
+                m_settings.maximized = (nativeWindow.displayState == NativeWindowDisplayState.MAXIMIZED);
+                m_settingsManager.saveSettings(m_settings);
+            }
+            
+            private var m_count:int = 1;
+            private function createNewMap():void
+            {
+                m_editorManager.createMap(100, 100, 7, "Unamed " + (m_count++));
             }
             
             //--------------------------------------
@@ -100,8 +99,14 @@
                 m_brushManager = BrushManager.getInstance();
                 m_brushManager.cursorManager = this.cursorManager;
                 m_drawingManager = DrawingManager.getInstance();
-                m_historyManager = RSHistoryManager.getInstance();
-                m_historyManager.addActionGroup(new HistoryActionGroup("default"));
+                m_editorManager = EditorManager.getInstance();
+                m_editorManager.addEventListener(MapPositionEvent.MOUSE_POSITION, mousePositionHandler);
+                
+                Alert.cancelLabel = "Cancel";
+                Alert.yesLabel = "Yes";
+                Alert.yesToAllLabel = "Yes to All";
+                Alert.noLabel = "No";
+                Alert.okLabel = "Ok";
                 
                 loadSettings();
             }
@@ -109,29 +114,42 @@
             protected function applicationCreationCompleteHandler(event:FlexEvent):void
             {
                this.title = DescriptorUtil.getName() + " " + DescriptorUtil.getVersionLabel();
-               this.editorPanel.mapDisplay.showGrid = this.showGrid;
                
-               test();
+               if (m_settings.maximized)
+                   maximize();
+            }
+            
+            protected function windowedApplicationClosingHandler(event:Event):void
+            {
+                saveSettings();
             }
             
             protected function nativeMenuSelectedHandler(event:MenuEvent):void
             {
                 switch(event.data)
                 {
+                    case IDEMenu.FILE_NEW_PROJECT:
+                        m_editorManager.removeAll();
+                        break;
+                    
+                    case IDEMenu.FILE_NEW_MAP:
+                        this.createNewMap();
+                        break;
+                    
                     case IDEMenu.FILE_EXIT:
                         this.close();
                         break;
                     
                     case IDEMenu.EDIT_UNDO:
-                        m_historyManager.undo();
+                        m_editorManager.undo();
                         break;
                     
                     case IDEMenu.EDIT_REDO:
-                        m_historyManager.redo();
+                        m_editorManager.redo();
                         break;
                     
                     case IDEMenu.VIEW_SHOW_GRID:
-                        this.showGrid = !this.showGrid;
+                        m_editorManager.showGrid = !m_editorManager.showGrid;
                         break;
                     
                     case IDEMenu.HELP_ABOUT:
@@ -144,10 +162,9 @@
                 m_brushManager.brushType = event.brushType;
             }
             
-            private function mouseMapChangedCallback(x:uint, y:uint, z:uint):void
+            protected function mousePositionHandler(event:MapPositionEvent):void
             {
-                if (statusbar && statusbar.positionLabel)
-                    statusbar.positionLabel.text = "x:" + x + ", y:" + y + ", z:" + z;
+                statusbar.positionLabel.text = "x:" + event.x + ", y:" + event.y + ", z:" + event.z;
             }
             
         ]]>
@@ -155,10 +172,11 @@
     
     <s:menu>
         <menu:IDEMenu id="nativeMenu"
-                      selected="nativeMenuSelectedHandler(event)"/>
+                      selected="nativeMenuSelectedHandler(event);"/>
     </s:menu>
     
-    <ide:Toolbar width="100%"
+    <ide:Toolbar id="toolbar"
+                 width="100%"
                  height="35"/>
     
     <ide:ToolsPanel id="toolsPanel"
@@ -166,7 +184,7 @@
                     height="100%"
                     top="35"
                     bottom="23"
-                    brushChange="toolsPanelBrushChangeHandler(event)"/>
+                    brushChange="toolsPanelBrushChangeHandler(event);"/>
     
     <ide:EditorPanel id="editorPanel"
                      width="100%"

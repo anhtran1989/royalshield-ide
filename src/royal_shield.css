@@ -12,6 +12,7 @@ global
     selectionColor: #294867;
     focusColor: #333300;
     accentColor: #6589AD;
+    modalTransparency: 0.1;
 }
 
 /*
@@ -42,6 +43,11 @@ s|Button
     skinClass: ClassReference("royalshield.components.skins.ButtonSkin");
 }
 
+s|SkinnableComponent
+{
+    focusSkin: ClassReference("royalshield.components.skins.FocusSkin");
+}
+
 s|ToggleButton
 {
     skinClass: ClassReference("royalshield.components.skins.ToggleButtonSkin");
@@ -58,9 +64,29 @@ ide|DropDownButton
     skinClass: ClassReference("royalshield.components.skins.DropDownButtonSkin");
 }
 
+ide|EditorPanel
+{
+    skinClass: ClassReference("royalshield.components.skins.EditorPanelSkin");
+}
+
 ide|HistoryControl
 {
     skinClass: ClassReference("royalshield.components.skins.HistoryControlSkin");
+}
+
+ide|MapEditor
+{
+    skinClass: ClassReference("royalshield.components.skins.MapEditorSkin");
+}
+
+ide|TabBarPlus
+{
+    skinClass: ClassReference("royalshield.components.skins.TabBarPlusSkin");
+}
+
+ide|TabPlus
+{
+    skinClass: ClassReference("royalshield.components.skins.TabPlusSkin");
 }
 
 ide|ShadowLine

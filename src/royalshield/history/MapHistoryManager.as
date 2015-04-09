@@ -1,11 +1,10 @@
 package royalshield.history
 {
-    import royalshield.errors.SingletonClassError;
     import royalshield.geom.Position;
     import royalshield.world.IWorldMap;
     import royalshield.world.Tile;
     
-    public class RSHistoryManager extends HistoryManager
+    public class MapHistoryManager extends HistoryManager
     {
         //--------------------------------------------------------------------------
         // PROPERTIES
@@ -17,14 +16,9 @@ package royalshield.history
         // CONSTRUCTOR
         //--------------------------------------------------------------------------
         
-        public function RSHistoryManager()
+        public function MapHistoryManager()
         {
             super(20);
-            
-            if (s_instance)
-                throw new SingletonClassError(RSHistoryManager);
-            
-            s_instance = this;
         }
         
         //--------------------------------------------------------------------------
@@ -90,19 +84,6 @@ package royalshield.history
                 if (newTile)
                     newTile.addItem(action.item);
             }
-        }
-        
-        //--------------------------------------------------------------------------
-        // STATIC
-        //--------------------------------------------------------------------------
-        
-        static private var s_instance:RSHistoryManager;
-        static public function getInstance():RSHistoryManager
-        {
-            if (!s_instance)
-                new RSHistoryManager();
-            
-            return s_instance;
         }
     }
 }

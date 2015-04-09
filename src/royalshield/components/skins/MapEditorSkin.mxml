@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<s:Skin xmlns:fx="http://ns.adobe.com/mxml/2009"
+        xmlns:s="library://ns.adobe.com/flex/spark"
+        xmlns:ide="royalshield.components.*"
+        alpha.disabled="0.5">
+    
+    <!-- host component -->
+    <fx:Metadata>
+        [HostComponent("royalshield.components.MapEditor")]
+    </fx:Metadata>
+
+    <!-- states -->
+    <s:states>
+        <s:State name="normal" />
+        <s:State name="disabled" />
+    </s:states>
+    
+    <!-- background -->
+    <s:Rect left="0" right="0" top="0" bottom="0">
+        <s:fill>
+            <s:SolidColor color="0x535353"/>
+        </s:fill>
+        <s:stroke>
+            <s:SolidColorStroke color="0x272727"/>
+        </s:stroke>
+    </s:Rect>
+    
+    <!-- content -->
+    <s:Group id="contentGroup" left="0" right="0" top="0" bottom="0" minWidth="0" minHeight="0">
+        
+        <ide:WorldMapDisplay id="mapDisplay"
+                             left="0"
+                             right="17"
+                             top="0"
+                             bottom="17"/>
+        
+        <s:HScrollBar id="horizontalScrollBar"
+                      focusEnabled="false"
+                      width="100%"
+                      right="17"
+                      bottom="0"/>
+        
+        <s:VScrollBar id="verticalScrollBar"
+                      focusEnabled="false"
+                      height="100%"
+                      right="0"
+                      top="0"
+                      bottom="17"/>
+        
+        <s:Button id="centralizeButton"
+                  width="16"
+                  height="16"
+                  right="0"
+                  bottom="0"
+                  toolTip="Centralize"
+                  icon="@Embed('../assets/centralize_icon.png')"/>
+    </s:Group>
+</s:Skin>

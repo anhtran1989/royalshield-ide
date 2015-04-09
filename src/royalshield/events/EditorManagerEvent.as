@@ -2,15 +2,24 @@ package royalshield.events
 {
     import flash.events.Event;
     
-    public class HistoryEvent extends Event
+    import royalshield.edition.IMapEditor;
+    
+    public class EditorManagerEvent extends Event
     {
+        //--------------------------------------------------------------------------
+        // PROPERTIES
+        //--------------------------------------------------------------------------
+        
+        public var editor:IMapEditor;
+        
         //--------------------------------------------------------------------------
         // CONSTRUCTOR
         //--------------------------------------------------------------------------
         
-        public function HistoryEvent(type:String, bubbles:Boolean = false, cancelable:Boolean = false)
+        public function EditorManagerEvent(type:String, editor:IMapEditor, bubbles:Boolean = false, cancelable:Boolean = false)
         {
             super(type, bubbles, cancelable);
+            this.editor = editor;
         }
         
         //--------------------------------------------------------------------------
@@ -18,20 +27,21 @@ package royalshield.events
         //--------------------------------------------------------------------------
         
         //--------------------------------------
-        // Override Public
+        // Public Protected
         //--------------------------------------
         
         override public function clone():Event
         {
-            return new HistoryEvent(this.type, this.bubbles, this.cancelable);
+            return new EditorManagerEvent(this.type, this.editor, this.bubbles, this.cancelable);
         }
         
         //--------------------------------------------------------------------------
         // STATIC
         //--------------------------------------------------------------------------
         
-        public static const LIST_CHANGE:String = "listChange";
-        public static const COLLECTION_CHANGE:String = "collectionChange";
-        public static const DISPOSE:String = "dispose";
+        static public const EDITOR_CREATING:String = "editorCreating";
+        static public const EDITOR_CREATED:String = "editorCreated";
+        static public const EDITOR_CHANGED:String = "editorChanged";
+        static public const EDITOR_REMOVED:String = "editorRemoved";
     }
 }

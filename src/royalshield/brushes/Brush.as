@@ -12,11 +12,11 @@ package royalshield.brushes
     import royalshield.assets.AssetsManager;
     import royalshield.core.GameAssets;
     import royalshield.drawing.IDrawingTarget;
+    import royalshield.edition.EditorManager;
     import royalshield.entities.items.Item;
     import royalshield.geom.Position;
     import royalshield.history.HistoryActionGroup;
     import royalshield.history.MapHistoryAction;
-    import royalshield.history.RSHistoryManager;
     import royalshield.utils.StringUtil;
     import royalshield.world.Tile;
     
@@ -29,7 +29,6 @@ package royalshield.brushes
         //--------------------------------------------------------------------------
         
         private var m_brushManager:IBrushManager;
-        private var m_target:IDrawingTarget;
         private var m_lastTile:Tile;
         private var m_type:String;
         private var m_itemId:uint;
@@ -77,17 +76,10 @@ package royalshield.brushes
         // Public
         //--------------------------------------
         
-        public function doPress(target:IDrawingTarget, x:uint, y:uint):void
+        public function doPress(x:uint, y:uint):void
         {
-            if (m_itemId != 0) {
-                m_target = target;
+            if (m_itemId != 0)
                 doDrag(x, y);
-            }
-        }
-        
-        public function doMove(x:uint, y:uint):void
-        {
-            //
         }
         
         public function doDrag(x:uint, y:uint):void
@@ -99,7 +91,8 @@ package royalshield.brushes
             if (!item)
                 return;
             
-            var tile:Tile = m_target.worldMap.setTile(m_target.mouseMapX, m_target.mouseMapY, m_target.mouseMapZ);
+            var target:IDrawingTarget = m_brushManager.target;
+            var tile:Tile = target.worldMap.setTile(target.mouseMapX, target.mouseMapY, target.mouseMapZ);
             if (!tile || tile == m_lastTile)
                 return;
             
@@ -123,13 +116,8 @@ package royalshield.brushes
                     actionGroup.addAction(m_actions[i]);
                 
                 m_actions.length = 0;
-                RSHistoryManager.getInstance().addActionGroup(actionGroup);
+                EditorManager.getInstance().currentHistoryManager.addActionGroup(actionGroup);
             }
-        }
-        
-        public function forceCommit():void
-        {
-            //
         }
         
         public function showCursor():void

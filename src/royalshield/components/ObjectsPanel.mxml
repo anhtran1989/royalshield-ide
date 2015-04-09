@@ -4,5 +4,5 @@
                    xmlns:s="library://ns.adobe.com/flex/spark"
                    xmlns:mx="library://ns.adobe.com/flex/mx"
                    backgroundColor="0x494949"
-                   borderColor="0x000000">
+                   borderColor="0x272727">
 </s:BorderContainer>

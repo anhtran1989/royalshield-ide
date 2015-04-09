@@ -8,11 +8,11 @@ package royalshield.brushes
     
     import royalshield.core.GameAssets;
     import royalshield.drawing.IDrawingTarget;
+    import royalshield.edition.EditorManager;
     import royalshield.entities.items.Item;
     import royalshield.geom.Position;
     import royalshield.history.HistoryActionGroup;
     import royalshield.history.MapHistoryAction;
-    import royalshield.history.RSHistoryManager;
     import royalshield.utils.StringUtil;
     import royalshield.world.Tile;
     
@@ -23,7 +23,6 @@ package royalshield.brushes
         //--------------------------------------------------------------------------
         
         private var m_brushManager:IBrushManager;
-        private var m_target:IDrawingTarget;
         private var m_lastTile:Tile;
         private var m_type:String;
         private var m_size:uint;
@@ -70,31 +69,26 @@ package royalshield.brushes
         // Public
         //--------------------------------------
         
-        public function doPress(target:IDrawingTarget, x:uint, y:uint):void
+        public function doPress(x:uint, y:uint):void
         {
-            m_target = target;
             doDrag(x, y);
-        }
-        
-        public function doMove(x:uint, y:uint):void
-        {
-            //
         }
         
         public function doDrag(x:uint, y:uint):void
         {
-            var tile:Tile = m_target.worldMap.getTile(m_target.mouseMapX, m_target.mouseMapY, m_target.mouseMapZ);
+            var target:IDrawingTarget = m_brushManager.target;
+            var tile:Tile = target.worldMap.getTile(target.mouseMapX, target.mouseMapY, target.mouseMapZ);
             if (!tile || tile == m_lastTile)
                 return;
             
             m_lastTile = tile;
             
-            var item:Item = m_target.worldMap.getTopItemAt(m_target.mouseMapX, m_target.mouseMapY, m_target.mouseMapZ);
+            var item:Item = target.worldMap.getTopItemAt(target.mouseMapX, target.mouseMapY, target.mouseMapZ);
             if (item && tile.removeItem(item)) {
                 m_actions[m_actions.length] = new MapHistoryAction(new Position(tile.x, tile.y, tile.z), null, item, -1, -1);
                 
                 if (tile.itemCount == 0)
-                    m_target.worldMap.deleteTile(tile);
+                    target.worldMap.deleteTile(tile);
             }
         }
         
@@ -111,13 +105,8 @@ package royalshield.brushes
                     actionGroup.addAction(m_actions[i]);
                 
                 m_actions.length = 0;
-                RSHistoryManager.getInstance().addActionGroup(actionGroup);
+                EditorManager.getInstance().currentHistoryManager.addActionGroup(actionGroup);
             }
-        }
-        
-        public function forceCommit():void
-        {
-            //
         }
         
         public function showCursor():void
@@ -131,7 +120,7 @@ package royalshield.brushes
                 var texture:BitmapData = GameAssets.getInstance().getObjectTexturePreview(0, null);
                 m_cursor.graphics.beginBitmapFill(texture);
                 m_cursor.graphics.drawRect(0, 0, texture.width, texture.height);
-                m_cursor.blendMode = BlendMode.DARKEN;
+                m_cursor.blendMode = BlendMode.INVERT;
                 m_cursor.alpha = 0.5;
                 
                 if (texture.width >= 64) {
