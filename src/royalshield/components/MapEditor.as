@@ -332,6 +332,10 @@ package royalshield.components
                     case Keyboard.PAGE_DOWN:
                         this.onLayerDown();
                         break;
+                    
+                    case Keyboard.DELETE:
+                        m_application.drawingManager.onDeleteSelectedTiles();
+                        break;
                 }
             } else if (event.ctrlKey && !event.shiftKey) {
                 switch(keyCode)

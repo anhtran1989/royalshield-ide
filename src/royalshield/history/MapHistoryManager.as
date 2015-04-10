@@ -1,5 +1,6 @@
 package royalshield.history
 {
+    import royalshield.entities.items.Item;
     import royalshield.geom.Position;
     import royalshield.world.IWorldMap;
     import royalshield.world.Tile;
@@ -31,21 +32,25 @@ package royalshield.history
         
         override protected function onUndo(action:IHistoryAction):void
         {
-            if (action is MapHistoryAction)
-                onMapUndo(action as MapHistoryAction);
+            if (action is ItemMapHistoryAction)
+                onItemMapUndo(action as ItemMapHistoryAction);
+            else if (TileMapHistoryAction(action))
+                onTileMapUndo(TileMapHistoryAction(action));
         }
         
         override protected function onRedo(action:IHistoryAction):void
         {
-            if (action is MapHistoryAction)
-                onMapRedo(action as MapHistoryAction);
+            if (action is ItemMapHistoryAction)
+                onItemMapRedo(ItemMapHistoryAction(action));
+            else if (TileMapHistoryAction(action))
+                onTileMapRedo(TileMapHistoryAction(action));
         }
         
         //--------------------------------------
         // Private
         //--------------------------------------
         
-        private function onMapUndo(action:MapHistoryAction):void
+        private function onItemMapUndo(action:ItemMapHistoryAction):void
         {
             var newPos:Position = action.newPosition;
             if (newPos) {
@@ -65,7 +70,7 @@ package royalshield.history
             }
         }
         
-        private function onMapRedo(action:MapHistoryAction):void
+        private function onItemMapRedo(action:ItemMapHistoryAction):void
         {
             var oldPos:Position = action.oldPosition;
             if (oldPos) {
@@ -83,6 +88,37 @@ package royalshield.history
                 var newTile:Tile = map.setTile(newPos.x, newPos.y, newPos.z);
                 if (newTile)
                     newTile.addItem(action.item);
+            }
+        }
+        
+        private function onTileMapUndo(action:TileMapHistoryAction):void
+        {
+            var tiles:Vector.<Tile> = action.tiles;
+            if (tiles) {
+                var length:uint = tiles.length;
+                for (var t:uint = 0; t < length; t++) {
+                    var oldTile:Tile = tiles[t];
+                    if (oldTile && oldTile.itemCount > 0) {
+                        var newTile:Tile = map.setTile(oldTile.x, oldTile.y, oldTile.z);
+                        for (var i:uint = 0; i < oldTile.itemCount; i++) {
+                            var item:Item = oldTile.getItemAt(i);
+                            newTile.addItem(item);
+                        }
+                    }
+                }
+            }
+        }
+        
+        private function onTileMapRedo(action:TileMapHistoryAction):void
+        {
+            var tiles:Vector.<Tile> = action.tiles;
+            if (tiles) {
+                var length:uint = tiles.length;
+                for (var i:uint = 0; i < length; i++) {
+                    var oldTile:Tile = tiles[i];
+                    if (oldTile)
+                        map.deleteTileAt(oldTile.x, oldTile.y, oldTile.z);
+                }
             }
         }
     }

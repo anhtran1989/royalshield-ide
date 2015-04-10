@@ -2,6 +2,7 @@ package royalshield.drawing
 {
     import flash.events.EventDispatcher;
     import flash.events.MouseEvent;
+    import flash.utils.Dictionary;
     
     import royalshield.brushes.BrushManager;
     import royalshield.brushes.IBrushManager;
@@ -13,6 +14,11 @@ package royalshield.drawing
     import royalshield.errors.SingletonClassError;
     import royalshield.events.DrawingEvent;
     import royalshield.events.EditorManagerEvent;
+    import royalshield.history.HistoryActionGroup;
+    import royalshield.history.TileMapHistoryAction;
+    import royalshield.utils.StringUtil;
+    import royalshield.world.IWorldMap;
+    import royalshield.world.Tile;
     
     public final class DrawingManager extends EventDispatcher implements IDrawingManager
     {
@@ -23,12 +29,16 @@ package royalshield.drawing
         private var m_currentTarget:IDrawingTarget;
         private var m_brushManager:IBrushManager;
         private var m_editorManager:IEditorManager;
+        private var m_selectedTiles:Dictionary;
+        private var m_selectedTileCount:uint;
         
         //--------------------------------------
         // Getters / Setters
         //--------------------------------------
         
         public function get currentTarget():IDrawingTarget { return m_currentTarget; }
+        public function get selectedTiles():Dictionary { return m_selectedTiles; }
+        public function get selectedTileCount():uint { return m_selectedTileCount; }
         
         //--------------------------------------------------------------------------
         // CONSTRUCTOR
@@ -80,6 +90,26 @@ package royalshield.drawing
             m_brushManager.target = target;
         }
         
+        public function onDeleteSelectedTiles():void
+        {
+            if (m_selectedTileCount == 0) return;
+            
+            var tiles:Vector.<Tile> = new Vector.<Tile>();
+            for (var tile:* in m_selectedTiles) {
+                if (m_currentTarget.worldMap.deleteTile(tile) && tile.itemCount != 0)
+                    tiles[tiles.length] = tile;
+            }
+            
+            if (tiles.length != 0) {
+                var description:String = StringUtil.format("Deleted {0} tile{1}", tiles.length, tiles.length > 1 ? "s" : "");
+                var group:HistoryActionGroup = new HistoryActionGroup(description);
+                group.addAction(new TileMapHistoryAction(tiles));
+                m_editorManager.currentHistoryManager.addActionGroup(group);
+            }
+            
+            onClearSelection();
+        }
+        
         //--------------------------------------
         // Private
         //--------------------------------------
@@ -108,6 +138,38 @@ package royalshield.drawing
             target.removeEventListener(MouseEvent.ROLL_OUT, targetRollOutHandler);
         }
         
+        private function onSelectTiles():void
+        {
+            if (!m_currentTarget) return;
+            
+            if (!m_selectedTiles || !m_currentTarget.shiftDown) {
+                m_selectedTiles = new Dictionary();
+                m_selectedTileCount = 0;
+            }
+            
+            var minx:uint = Math.min(m_currentTarget.mouseMapX, m_currentTarget.mouseDownX);
+            var miny:uint = Math.min(m_currentTarget.mouseMapY, m_currentTarget.mouseDownY);
+            var maxx:uint = minx + Math.abs(m_currentTarget.mouseMapX - m_currentTarget.mouseDownX);
+            var maxy:uint = miny + Math.abs(m_currentTarget.mouseMapY - m_currentTarget.mouseDownY);
+            var map:IWorldMap = m_currentTarget.worldMap;
+            
+            for (var x:uint = minx; x <= maxx; x++) {
+                for (var y:uint = miny; y <= maxy; y++) {
+                    var tile:Tile = map.getTile(x, y, map.z);
+                    if (tile) {
+                        m_selectedTiles[tile] = true;
+                        m_selectedTileCount++;
+                    }
+                }
+            }
+        }
+        
+        private function onClearSelection():void
+        {
+            m_selectedTiles = null;
+            m_selectedTileCount = 0;
+        }
+        
         //--------------------------------------
         // Event Handlers
         //--------------------------------------
@@ -129,6 +191,7 @@ package royalshield.drawing
         
         private function targetPressHandler(event:DrawingEvent):void
         {
+            onClearSelection();
             m_brushManager.doPress(m_currentTarget.mouseDownX, m_currentTarget.mouseDownY);
         }
         
@@ -145,11 +208,17 @@ package royalshield.drawing
         private function targetSelectionStartHandler(event:DrawingEvent):void
         {
             m_brushManager.hideCursor();
+            
+            if (!m_currentTarget.shiftDown)
+                onClearSelection();
         }
         
         private function targetSelectionEndHandler(event:DrawingEvent):void
         {
             m_brushManager.showCursor();
+            
+            if (m_brushManager.isOver)
+                onSelectTiles();
         }
         
         private function targetZoomChangeHandler(event:DrawingEvent):void

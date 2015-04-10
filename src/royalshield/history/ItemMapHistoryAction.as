@@ -4,7 +4,7 @@ package royalshield.history
     import royalshield.geom.Position;
     import royalshield.history.IHistoryAction;
     
-    public class MapHistoryAction implements IHistoryAction
+    public class ItemMapHistoryAction implements IHistoryAction
     {
         //--------------------------------------------------------------------------
         // PROPERTIES
@@ -32,7 +32,7 @@ package royalshield.history
         // CONSTRUCTOR
         //--------------------------------------------------------------------------
         
-        public function MapHistoryAction(oldPosition:Position, newPosition:Position, item:Item, oldIndex:int, newIndex:int, count:uint = 1)
+        public function ItemMapHistoryAction(oldPosition:Position, newPosition:Position, item:Item, oldIndex:int, newIndex:int, count:uint = 1)
         {
             m_oldPosition = oldPosition;
             m_newPosition = newPosition;

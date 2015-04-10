@@ -12,7 +12,7 @@ package royalshield.brushes
     import royalshield.entities.items.Item;
     import royalshield.geom.Position;
     import royalshield.history.HistoryActionGroup;
-    import royalshield.history.MapHistoryAction;
+    import royalshield.history.ItemMapHistoryAction;
     import royalshield.utils.StringUtil;
     import royalshield.world.Tile;
     
@@ -29,7 +29,7 @@ package royalshield.brushes
         private var m_zoom:Number;
         private var m_cursorId:uint;
         private var m_cursor:Shape;
-        private var m_actions:Vector.<MapHistoryAction>;
+        private var m_actions:Vector.<ItemMapHistoryAction>;
         
         //--------------------------------------
         // Getters / Setters 
@@ -58,7 +58,7 @@ package royalshield.brushes
             m_size = 1;
             m_zoom = 1.0;
             m_type = BrushType.ERASER;
-            m_actions = new Vector.<MapHistoryAction>();
+            m_actions = new Vector.<ItemMapHistoryAction>();
         }
         
         //--------------------------------------------------------------------------
@@ -85,7 +85,7 @@ package royalshield.brushes
             
             var item:Item = target.worldMap.getTopItemAt(target.mouseMapX, target.mouseMapY, target.mouseMapZ);
             if (item && tile.removeItem(item)) {
-                m_actions[m_actions.length] = new MapHistoryAction(new Position(tile.x, tile.y, tile.z), null, item, -1, -1);
+                m_actions[m_actions.length] = new ItemMapHistoryAction(new Position(tile.x, tile.y, tile.z), null, item, -1, -1);
                 
                 if (tile.itemCount == 0)
                     target.worldMap.deleteTile(tile);

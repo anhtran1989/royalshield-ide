@@ -11,6 +11,8 @@ package royalshield.components
     
     import royalshield.core.GameConsts;
     import royalshield.display.GameCanvas;
+    import royalshield.drawing.DrawingManager;
+    import royalshield.drawing.IDrawingManager;
     import royalshield.drawing.IDrawingTarget;
     import royalshield.entities.items.Item;
     import royalshield.events.DrawingEvent;
@@ -35,6 +37,7 @@ package royalshield.components
         
         public var editor:MapEditor;
         
+        private var m_drawingManager:IDrawingManager;
         private var m_worldMap:IWorldMap;
         private var m_matrix:Matrix;
         private var m_viewportX:int;
@@ -47,6 +50,8 @@ package royalshield.components
         private var m_mouseDownX:uint;
         private var m_mouseDownY:uint;
         private var m_mouseDown:Boolean;
+        private var m_ctrlDown:Boolean;
+        private var m_shiftDown:Boolean;
         private var m_zoom:Number;
         private var m_gridSurface:FlexShape;
         private var m_mouseTileSurface:FlexShape;
@@ -85,6 +90,10 @@ package royalshield.components
         
         public function get mouseDownX():uint { return m_mouseDownX; }
         public function get mouseDownY():uint { return m_mouseDownY; }
+        
+        public function get mouseDown():Boolean { return m_mouseDown; }
+        public function get ctrlDown():Boolean { return m_ctrlDown; }
+        public function get shiftDown():Boolean { return m_shiftDown; }
         
         public function get zoom():Number { return m_zoom; }
         public function set zoom(value:Number):void
@@ -132,6 +141,8 @@ package royalshield.components
         {
             super();
             
+            m_drawingManager = DrawingManager.getInstance();
+            
             m_matrix = new Matrix();
             m_zoom = 1.0;
             
@@ -149,6 +160,11 @@ package royalshield.components
         //--------------------------------------
         // Public
         //--------------------------------------
+        
+        public function draw():void
+        {
+            invalidateDisplayList();
+        }
         
         public function dispose():void
         {
@@ -240,14 +256,14 @@ package royalshield.components
             var tx:uint = x + m_worldMap.x;
             var ty:uint = y + m_worldMap.y;
             var tile:Tile = m_worldMap.getTile(tx, ty, z);
-            if (!tile)
-                return;
+            if (!tile) return;
             
             var tileOffsetX:uint = (x + 1) * GameConsts.VIEWPORT_TILE_SIZE;
             var tileOffsetY:uint = (y + 1) * GameConsts.VIEWPORT_TILE_SIZE;
             var length:uint = tile.itemCount;
             var item:Item;
             
+            CANVAS.useAlphaBitmapData = (m_drawingManager.selectedTileCount != 0 && m_drawingManager.selectedTiles[tile] !== undefined);
             for (var i:int = 0; i < length; i++) {
                 item = tile.getItemAt(i);
                 if (item)
@@ -281,7 +297,7 @@ package royalshield.components
                 var x:Number = Math.floor(this.mouseX / size) * size;
                 var y:Number = Math.floor(this.mouseY / size) * size;
                 if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
-                    g.lineStyle(0.4, 0);
+                    g.lineStyle(0.5, 0x000000, 0.6);
                     g.drawRect(x, y, size, size);
                     g.endFill();
                 }
@@ -333,8 +349,10 @@ package royalshield.components
             m_mouseDownX = m_mouseMapX;
             m_mouseDownY = m_mouseMapY;
             m_mouseDown = true;
+            m_ctrlDown = event.ctrlKey;
+            m_shiftDown = event.shiftKey;
             
-            if (event.ctrlKey) {
+            if (m_ctrlDown || m_shiftDown) {
                 m_selectionSurface.startDraw(this.mouseX, this.mouseY);
                 dispatchEvent(new DrawingEvent(DrawingEvent.SELECTION_START));
             }
@@ -358,9 +376,6 @@ package royalshield.components
         
         protected function mouseUpHandler(event:MouseEvent):void
         {
-            m_mouseDownX = uint.MAX_VALUE;
-            m_mouseDownY = uint.MAX_VALUE;
-            
             if (m_mouseDown) {
                 if (m_selectionSurface.selecting)
                     dispatchEvent(new DrawingEvent(DrawingEvent.SELECTION_END));
@@ -371,6 +386,10 @@ package royalshield.components
                 systemManager.stage.addEventListener(MouseEvent.MOUSE_UP, mouseUpHandler);
                 m_selectionSurface.clear();
             }
+            
+            m_mouseDownX = uint.MAX_VALUE;
+            m_mouseDownY = uint.MAX_VALUE;
+            invalidateDisplayList();
         }
         
         //--------------------------------------------------------------------------
