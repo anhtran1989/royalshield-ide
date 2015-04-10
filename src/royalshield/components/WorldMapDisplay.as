@@ -280,10 +280,11 @@ package royalshield.components
                 var size:Number = GameConsts.VIEWPORT_TILE_SIZE * m_zoom;
                 var x:Number = Math.floor(this.mouseX / size) * size;
                 var y:Number = Math.floor(this.mouseY / size) * size;
-                
-                g.lineStyle(0.4, 0);
-                g.drawRect(x, y, size, size);
-                g.endFill();
+                if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
+                    g.lineStyle(0.4, 0);
+                    g.drawRect(x, y, size, size);
+                    g.endFill();
+                }
             }
         }
         
