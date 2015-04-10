@@ -20,6 +20,9 @@ package royalshield.edition
         function get showGrid():Boolean;
         function set showGrid(value:Boolean):void;
         
+        function get showMouseTile():Boolean;
+        function set showMouseTile(value:Boolean):void;
+        
         function get editorCount():uint;
         
         function get waiting():Boolean;

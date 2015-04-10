@@ -102,6 +102,8 @@
             private function saveSettings():void
             {
                 m_settings.maximized = (nativeWindow.displayState == NativeWindowDisplayState.MAXIMIZED);
+                m_settings.showGrid = m_editorManager.showGrid;
+                m_settings.showMouseTile = m_editorManager.showMouseTile;
                 m_settingsManager.saveSettings(m_settings);
             }
             
@@ -134,6 +136,9 @@
                
                if (m_settings.maximized)
                    maximize();
+               
+               m_editorManager.showGrid = m_settings.showGrid;
+               m_editorManager.showMouseTile = m_settings.showMouseTile;
             }
             
             protected function windowedApplicationClosingHandler(event:Event):void
@@ -180,6 +185,10 @@
                     
                     case IDEMenu.VIEW_SHOW_GRID:
                         m_editorManager.showGrid = !m_editorManager.showGrid;
+                        break;
+                    
+                    case IDEMenu.VIEW_SHOW_TILE:
+                        m_editorManager.showMouseTile = !m_editorManager.showMouseTile;
                         break;
                     
                     case IDEMenu.HELP_ABOUT:

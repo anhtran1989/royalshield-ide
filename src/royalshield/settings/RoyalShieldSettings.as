@@ -8,6 +8,9 @@ package royalshield.settings
         
         public var maximized:Boolean = true;
         
+        public var showGrid:Boolean = true;
+        public var showMouseTile:Boolean = true;
+        
         //--------------------------------------------------------------------------
         // CONSTRUCTOR
         //--------------------------------------------------------------------------

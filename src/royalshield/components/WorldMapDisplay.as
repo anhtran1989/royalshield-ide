@@ -49,8 +49,10 @@ package royalshield.components
         private var m_mouseDown:Boolean;
         private var m_zoom:Number;
         private var m_gridSurface:FlexShape;
-        private var m_showGrid:Boolean;
+        private var m_mouseTileSurface:FlexShape;
         private var m_selectionSurface:SelectionSurface;
+        private var m_showGrid:Boolean;
+        private var m_showMouseTile:Boolean;
         
         private var m_mouseMapChanged:Signal;
         
@@ -111,6 +113,15 @@ package royalshield.components
             }
         }
         
+        public function get showMouseTile():Boolean { return m_showMouseTile; }
+        public function set showMouseTile(value:Boolean):void
+        {
+            if (m_showMouseTile != value) {
+                m_showMouseTile = value;
+                invalidateDisplayList();
+            }
+        }
+        
         public function get onMouseMapChanged():Signal { return m_mouseMapChanged; }
         
         //--------------------------------------------------------------------------
@@ -160,6 +171,10 @@ package royalshield.components
             m_gridSurface.blendMode = BlendMode.INVERT;
             addChild(m_gridSurface);
             
+            m_mouseTileSurface = new FlexShape();
+            m_mouseTileSurface.blendMode = BlendMode.INVERT;
+            addChild(m_mouseTileSurface);
+            
             m_selectionSurface = new SelectionSurface();
             addChild(m_selectionSurface);
         }
@@ -194,6 +209,7 @@ package royalshield.components
             graphics.endFill();
             
             drawGrid(w, h);
+            drawMouseTile();
         }
         
         //--------------------------------------
@@ -252,6 +268,21 @@ package royalshield.components
                         g.drawRect(x * size, y * size, size, size);
                     }
                 }
+                g.endFill();
+            }
+        }
+        
+        private function drawMouseTile():void
+        {
+            var g:Graphics = m_mouseTileSurface.graphics;
+            g.clear();
+            if (m_showMouseTile) {
+                var size:Number = GameConsts.VIEWPORT_TILE_SIZE * m_zoom;
+                var x:Number = Math.floor(this.mouseX / size) * size;
+                var y:Number = Math.floor(this.mouseY / size) * size;
+                
+                g.lineStyle(0.4, 0);
+                g.drawRect(x, y, size, size);
                 g.endFill();
             }
         }
@@ -315,6 +346,7 @@ package royalshield.components
         protected function mouseMoveHandler(event:MouseEvent):void
         {
             refreshMouseMap();
+            drawMouseTile();
             
             if (m_mouseDown) {
                 m_selectionSurface.update(this.mouseX, this.mouseY);

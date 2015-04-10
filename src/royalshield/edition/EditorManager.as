@@ -40,6 +40,7 @@ package royalshield.edition
         private var m_currentMap:IWorldMap;
         private var m_currentHistoryManager:IHistoryManager;
         private var m_showGrid:Boolean;
+        private var m_showMouseTile:Boolean;
         private var m_closingAll:Boolean;
         private var m_waiting:Boolean;
         private var m_untitledCount:uint;
@@ -70,6 +71,17 @@ package royalshield.edition
                 
                 if (m_currentEditor && m_currentEditor.display)
                     m_currentEditor.display.showGrid = m_showGrid;
+            }
+        }
+        
+        public function get showMouseTile():Boolean { return m_showMouseTile; }
+        public function set showMouseTile(value:Boolean):void
+        {
+            if (m_showMouseTile != value) {
+                m_showMouseTile = value;
+                
+                if (m_currentEditor && m_currentEditor.display)
+                    m_currentEditor.display.showMouseTile = m_showMouseTile;
             }
         }
         
@@ -265,6 +277,7 @@ package royalshield.edition
                 m_currentMap = editor.map;
                 m_currentHistoryManager = editor.historyManager;
                 editor.display.showGrid = this.showGrid;
+                editor.display.showMouseTile = this.showMouseTile;
                 editor.display.invalidateDisplayList();
                 dispatchEvent(new EditorManagerEvent(EditorManagerEvent.EDITOR_CHANGED, editor));
             }

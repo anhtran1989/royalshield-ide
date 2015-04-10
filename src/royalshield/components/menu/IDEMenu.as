@@ -179,6 +179,15 @@ package royalshield.components.menu
             viewShowGrid.isCheck = true;
             viewMenu.addMenuItem(viewShowGrid);
             
+            // View > Show Tile
+            var viewShowTile:MenuItem = new MenuItem();
+            viewShowTile.label = "Show Tile";
+            viewShowTile.data = VIEW_SHOW_TILE;
+            viewShowTile.keyEquivalent = "T";
+            viewShowTile.controlKey = true;
+            viewShowTile.isCheck = true;
+            viewMenu.addMenuItem(viewShowTile);
+            
             // Help
             var helpMenu:MenuItem = new MenuItem();
             helpMenu.label = "Help";
@@ -242,6 +251,9 @@ package royalshield.components.menu
             
             // menu View > Show Grid
             nativeMenu.items[(index + 2)].submenu.items[3].checked = m_application.editorManager.showGrid;
+            
+            // menu View > Show Tile
+            nativeMenu.items[(index + 2)].submenu.items[4].checked = m_application.editorManager.showMouseTile;
         }
         
         //--------------------------------------------------------------------------
@@ -259,6 +271,7 @@ package royalshield.components.menu
         static public const VIEW_ZOOM_IN:String = "viewZoomIn";
         static public const VIEW_ZOOM_OUT:String = "viewZoomOut";
         static public const VIEW_SHOW_GRID:String = "viewShowGrid";
+        static public const VIEW_SHOW_TILE:String = "viewShowTile";
         static public const HELP_ABOUT:String = "helpAbout";
     }
 }
