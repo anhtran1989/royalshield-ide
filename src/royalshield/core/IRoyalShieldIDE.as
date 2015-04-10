@@ -14,7 +14,9 @@ package royalshield.core
         function get brushManager():IBrushManager;
         function get drawingManager():IDrawingManager;
         function get editorManager():IEditorManager;
+        function get applicationClosing():Boolean;
         
+        function createNewMap():void;
         function cancelClosing():void;
     }
 }

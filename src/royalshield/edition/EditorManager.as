@@ -42,7 +42,7 @@ package royalshield.edition
         private var m_showGrid:Boolean;
         private var m_closingAll:Boolean;
         private var m_waiting:Boolean;
-        private var m_changed:Boolean;
+        private var m_untitledCount:uint;
         
         //--------------------------------------
         // Getters / Setters
@@ -75,6 +75,17 @@ package royalshield.edition
         
         public function get editorCount():uint { return m_editors.length; }
         
+        public function get waiting():Boolean { return m_waiting; }
+        
+        public function get changed():Boolean
+        {
+            for (var i:uint = 0; i < m_editors.length; i++) {
+                if (m_editors[i].changed)
+                    return true;
+            }
+            return false;
+        }
+        
         //--------------------------------------------------------------------------
         // CONSTRUCTOR
         //--------------------------------------------------------------------------
@@ -88,6 +99,7 @@ package royalshield.edition
             
             m_application = IRoyalShieldIDE(FlexGlobals.topLevelApplication);
             m_editors = new Vector.<IMapEditor>();
+            m_untitledCount = 1;
         }
         
         //--------------------------------------------------------------------------
@@ -98,15 +110,15 @@ package royalshield.edition
         // Public
         //--------------------------------------
         
-        public function createMap(width:uint, height:uint, layers:uint, name:String):IMapEditor
+        public function createMap(name:String, width:uint, height:uint, layers:uint):IMapEditor
         {
-            if (width == 0 || height == 0 || layers == 0)
-                throw new ArgumentError("Invalid map size.");
-            
             if (isNullOrEmpty(name))
                 throw new NullOrEmptyArgumentError("name");
             
-            return createEditor(new WorldMap(width, height, layers, name));
+            if (width == 0 || height == 0 || layers == 0)
+                throw new ArgumentError("Invalid map size.");
+            
+            return createEditor(new WorldMap(name, width, height, layers));
         }
         
         public function createEditor(map:IWorldMap):IMapEditor
@@ -137,7 +149,7 @@ package royalshield.edition
                 
                 m_waiting = true;
                 
-                var text:String = "Do you want to save changes to {0} before closing?";
+                var text:String = "Do you want to save changes to '{0}' before closing?";
                 Alert.show(StringUtil.format(text, editor.map.name),
                            "Save",
                            Alert.YES | Alert.NO | Alert.CANCEL,
@@ -186,7 +198,6 @@ package royalshield.edition
                 m_currentEditor = null;
                 m_currentHistoryManager = null;
                 m_currentMap = null;
-                m_changed = false;
                 m_waiting = false;
                 m_closingAll = false;
             }
@@ -219,6 +230,23 @@ package royalshield.edition
         {
             if (m_currentHistoryManager)
                 m_currentHistoryManager.redo();
+        }
+        
+        public function createUntitledName():String
+        {
+            var count:uint = m_untitledCount;
+            var name:String = "Untitled - " + count;
+            
+            for (var i:uint = 0; i < m_editors.length; i++) {
+                if (m_editors[i].map.name == name) {
+                    count++;
+                    name = "Untitled - " + count;
+                    i = 0;
+                }
+            }
+            
+            m_untitledCount = count;
+            return name;
         }
         
         //--------------------------------------

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<s:SparkSkin xmlns:fx="http://ns.adobe.com/mxml/2009"
+             xmlns:s="library://ns.adobe.com/flex/spark"
+             xmlns:fb="http://ns.adobe.com/flashbuilder/2009"
+             minWidth="30"
+             minHeight="19"
+             alpha.disabled="0.5">
+    
+    <!-- host component -->
+    <fx:Metadata>
+        <![CDATA[[HostComponent("spark.components.NumericStepper")]]]>
+    </fx:Metadata> 
+    
+    <!-- states -->
+    <s:states>
+        <s:State name="normal" />
+        <s:State name="disabled" />
+    </s:states>
+    
+    <s:Button id="incrementButton"
+              right="0"
+              top="0"
+              width="16"
+              height="10"
+              tabEnabled="false" 
+              skinClass="royalshield.components.skins.NumericStepperIncrementButtonSkin" />
+    
+    <s:Button id="decrementButton"
+              right="0"
+              bottom="0"
+              width="16"
+              height="10"
+              tabEnabled="false" 
+              skinClass="royalshield.components.skins.NumericStepperDecrementButtonSkin" />
+    
+    <s:TextInput id="textDisplay"
+                 right="15"
+                 top="0"
+                 bottom="0"
+                 height="19"
+                 textAlign="right"
+                 skinClass="royalshield.components.skins.NumericStepperTextInputSkin" />
+</s:SparkSkin>

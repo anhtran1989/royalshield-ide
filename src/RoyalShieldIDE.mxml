@@ -23,17 +23,21 @@
             import royalshield.brushes.BrushManager;
             import royalshield.brushes.IBrushManager;
             import royalshield.components.Alert;
+            import royalshield.components.NewMapWindow;
             import royalshield.drawing.DrawingManager;
             import royalshield.drawing.IDrawingManager;
             import royalshield.edition.EditorManager;
             import royalshield.edition.IEditorManager;
             import royalshield.events.BrushEvent;
+            import royalshield.events.EditorManagerEvent;
             import royalshield.events.MapPositionEvent;
             import royalshield.events.MenuEvent;
+            import royalshield.managers.PopUpWindowManager;
             import royalshield.settings.ISettingsManager;
             import royalshield.settings.RoyalShieldSettings;
             import royalshield.settings.SettingsManager;
             import royalshield.utils.DescriptorUtil;
+            import royalshield.utils.DialogDetail;
             
             //--------------------------------------------------------------------------
             // PROPERTIES
@@ -44,6 +48,8 @@
             private var m_brushManager:IBrushManager;
             private var m_drawingManager:IDrawingManager;
             private var m_editorManager:IEditorManager;
+            private var m_applicationClosing:Boolean;
+            private var m_waiting:Boolean;
             
             //--------------------------------------
             // Getters / Setters
@@ -53,6 +59,7 @@
             public function get brushManager():IBrushManager { return m_brushManager; }
             public function get drawingManager():IDrawingManager { return m_drawingManager; }
             public function get editorManager():IEditorManager { return m_editorManager; }
+            public function get applicationClosing():Boolean { return m_applicationClosing; }
             
             //--------------------------------------------------------------------------
             // METHODS
@@ -62,9 +69,24 @@
             // Public
             //--------------------------------------
             
+            public function createNewMap():void
+            {
+                var window:NewMapWindow = new NewMapWindow();
+                window.addEventListener(Event.CLOSE, closeHandler);
+                window.open();
+                
+                PopUpWindowManager.addWindow(window);
+                
+                function closeHandler(event:Event):void
+                {
+                    if (window.detail == DialogDetail.CONFIRM)
+                        m_editorManager.createMap(window.mapName, window.mapWidth, window.mapHeight, window.mapLayers);
+                }
+            }
+            
             public function cancelClosing():void
             {
-                
+                m_applicationClosing = false;
             }
             
             //--------------------------------------
@@ -83,12 +105,6 @@
                 m_settingsManager.saveSettings(m_settings);
             }
             
-            private var m_count:int = 1;
-            private function createNewMap():void
-            {
-                m_editorManager.createMap(100, 100, 7, "Unamed " + (m_count++));
-            }
-            
             //--------------------------------------
             // Event Handlers
             //--------------------------------------
@@ -100,6 +116,7 @@
                 m_brushManager.cursorManager = this.cursorManager;
                 m_drawingManager = DrawingManager.getInstance();
                 m_editorManager = EditorManager.getInstance();
+                m_editorManager.addEventListener(EditorManagerEvent.EDITOR_REMOVED, editorRemovedHandler);
                 m_editorManager.addEventListener(MapPositionEvent.MOUSE_POSITION, mousePositionHandler);
                 
                 Alert.cancelLabel = "Cancel";
@@ -121,6 +138,19 @@
             
             protected function windowedApplicationClosingHandler(event:Event):void
             {
+                if (m_waiting || m_editorManager.waiting) {
+                    event.preventDefault();
+                    return;
+                }
+                
+                m_applicationClosing = true;
+                
+                if (m_editorManager.changed) {
+                    event.preventDefault();
+                    m_editorManager.removeAll();
+                    return;
+                }
+                
                 saveSettings();
             }
             
@@ -137,7 +167,7 @@
                         break;
                     
                     case IDEMenu.FILE_EXIT:
-                        this.close();
+                        this.exit();
                         break;
                     
                     case IDEMenu.EDIT_UNDO:
@@ -160,6 +190,14 @@
             protected function toolsPanelBrushChangeHandler(event:BrushEvent):void
             {
                 m_brushManager.brushType = event.brushType;
+            }
+            
+            protected function editorRemovedHandler(event:EditorManagerEvent):void
+            {
+                if (m_applicationClosing && m_editorManager.editorCount == 0) {
+                    m_waiting = false;
+                    this.close();
+                }
             }
             
             protected function mousePositionHandler(event:MapPositionEvent):void

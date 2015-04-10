@@ -33,7 +33,8 @@ package royalshield.events
         public static const BRUSH_PRESS:String = "brushPress";
         public static const BRUSH_DRAG:String = "brushDrag";
         public static const BRUSH_RELEASE:String = "brushRelease";
+        public static const SELECTION_START:String = "selectionStart";
+        public static const SELECTION_END:String = "selectionEnd";
         public static const ZOOM:String = "zoom";
-        public static const SELECTION_CHANGE:String = "selectionChange";
     }
 }

@@ -101,7 +101,7 @@ package royalshield.brushes
         
         public function showCursor():void
         {
-            if (m_brush)
+            if (m_brush && m_isOver)
                 m_brush.showCursor();
         }
         
@@ -141,8 +141,7 @@ package royalshield.brushes
                 m_brush.zoom = m_zoom;
                 m_brush.brushManager = this;
                 
-                if (m_isOver)
-                    m_brush.showCursor();
+                this.showCursor();
             }
             
             dispatchEvent(new BrushEvent(BrushEvent.BRUSH_CHANGE, this.brushType));

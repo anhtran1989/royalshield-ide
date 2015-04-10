@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<s:Window xmlns:fx="http://ns.adobe.com/mxml/2009"
+          xmlns:s="library://ns.adobe.com/flex/spark"
+          xmlns:mx="library://ns.adobe.com/flex/mx"
+          xmlns:ide="royalshield.components.*"
+          width="300"
+          height="200"
+          type="utility"
+          showStatusBar="false"
+          resizable="false"
+          title="New Map"
+          fontSize="11"
+          backgroundColor="0x494949"
+          creationComplete="creationCompleteHandler(event)">
+    
+    <fx:Script>
+        <![CDATA[
+            import mx.events.FlexEvent;
+            
+            import spark.events.TextOperationEvent;
+            
+            import royalshield.core.GameConsts;
+            import royalshield.edition.EditorManager;
+            import royalshield.utils.DialogDetail;
+            import royalshield.utils.isNullOrEmpty;
+            
+            //--------------------------------------------------------------------------
+            // PROPERTIES
+            //--------------------------------------------------------------------------
+            
+            private var m_mapName:String;
+            private var m_mapNameChanged:Boolean;
+            private var m_mapWidth:uint = GameConsts.MIN_MAP_WIDTH;
+            private var m_mapWidthChanged:Boolean;
+            private var m_mapHeight:uint = GameConsts.MIN_MAP_HEIGHT;
+            private var m_mapHeightChanged:Boolean;
+            private var m_mapLayers:uint = GameConsts.MIN_MAP_LAYERS;
+            private var m_mapLayersChanged:Boolean;
+            private var m_detail:uint = DialogDetail.CANCEL;
+            
+            //--------------------------------------
+            // Getters / Setters
+            //--------------------------------------
+            
+            public function get mapName():String { return m_mapName; }
+            public function set mapName(value:String):void
+            {
+                if (m_mapName != value) {
+                    m_mapName = value;
+                    m_mapNameChanged = true;
+                    invalidateProperties();
+                }
+            }
+            
+            public function get mapWidth():uint { return m_mapWidth; }
+            public function set mapWidth(value:uint):void
+            {
+                value = Math.min(GameConsts.MAX_MAP_WIDTH, Math.max(GameConsts.MIN_MAP_WIDTH, value));
+                
+                if (m_mapWidth != value) {
+                    m_mapWidth = value;
+                    m_mapWidthChanged = true;
+                    invalidateProperties();
+                }
+            }
+            
+            public function get mapHeight():uint { return m_mapHeight; }
+            public function set mapHeight(value:uint):void
+            {
+                value = Math.min(GameConsts.MAX_MAP_HEIGHT, Math.max(GameConsts.MIN_MAP_HEIGHT, value));
+                
+                if (m_mapHeight != value) {
+                    m_mapHeight = value;
+                    m_mapHeightChanged = true;
+                    invalidateProperties();
+                }
+            }
+            
+            public function get mapLayers():uint { return m_mapLayers; }
+            public function set mapLayers(value:uint):void
+            {
+                value = Math.min(GameConsts.MAX_MAP_LAYERS, Math.max(GameConsts.MIN_MAP_LAYERS, value));
+                
+                if (m_mapLayers != value) {
+                    m_mapLayers = value;
+                    m_mapLayersChanged = true;
+                    invalidateProperties();
+                }
+            }
+            
+            public function get detail():uint { return m_detail; }
+            
+            //--------------------------------------------------------------------------
+            // METHODS
+            //--------------------------------------------------------------------------
+            
+            //--------------------------------------
+            // Override Protected
+            //--------------------------------------
+            
+            override protected function commitProperties():void
+            {
+                super.commitProperties();
+                
+                if (m_mapNameChanged) {
+                    mapNameTextInput.text = m_mapName;
+                    confirmButton.enabled = !isNullOrEmpty(m_mapName);
+                    m_mapNameChanged = false;
+                }
+                
+                if (m_mapWidthChanged) {
+                    mapWidthNumericStepper.value = m_mapWidth;
+                    m_mapWidthChanged = false;
+                }
+                
+                if (m_mapHeightChanged) {
+                    mapHeightNumericStepper.value = m_mapHeight;
+                    m_mapHeightChanged = false;
+                }
+                
+                if (m_mapLayersChanged) {
+                    mapLayersNumericStepper.value = m_mapLayers;
+                    m_mapLayersChanged = false;
+                }
+            }
+            
+            //--------------------------------------
+            // Event Handlers
+            //--------------------------------------
+            
+            protected function creationCompleteHandler(event:FlexEvent):void
+            {
+                if (isNullOrEmpty(m_mapName))
+                    this.mapName = EditorManager.getInstance().createUntitledName();
+                
+                mapWidthNumericStepper.minimum = GameConsts.MIN_MAP_WIDTH;
+                mapWidthNumericStepper.maximum = GameConsts.MAX_MAP_WIDTH;
+                mapWidthNumericStepper.value = this.mapWidth;
+                
+                mapHeightNumericStepper.minimum = GameConsts.MIN_MAP_HEIGHT;
+                mapHeightNumericStepper.maximum = GameConsts.MAX_MAP_HEIGHT;
+                mapHeightNumericStepper.value = this.mapHeight;
+                
+                mapLayersNumericStepper.minimum = GameConsts.MIN_MAP_LAYERS;
+                mapLayersNumericStepper.maximum = GameConsts.MAX_MAP_LAYERS;
+                mapLayersNumericStepper.value = this.mapLayers;
+                
+                focusManager.setFocus(cancelButton);
+                focusManager.showFocus();
+            }
+            
+            protected function confirmButtonClickHandler(event:MouseEvent):void
+            {
+                m_detail = DialogDetail.CONFIRM;
+                close();
+            }
+            
+            protected function mapNameChangeHandler(event:TextOperationEvent):void
+            {
+                this.mapName = mapNameTextInput.text;
+            }
+            
+            protected function mapWidthChangeHandler(event:Event):void
+            {
+                m_mapWidth = mapWidthNumericStepper.value;
+            }
+            
+            protected function mapHeightChangeHandler(event:Event):void
+            {
+                m_mapHeight = mapHeightNumericStepper.value;
+            }
+            
+            protected function mapLayersChangeHandler(event:Event):void
+            {
+                m_mapLayers = mapLayersNumericStepper.value;
+            }
+            
+        ]]>
+    </fx:Script>
+    
+    <s:layout>
+        <s:VerticalLayout gap="10"/>
+    </s:layout>
+    
+    <s:Form width="100%" height="100%" fontStyle="normal">
+        <s:layout>
+            <s:FormLayout gap="-14"
+                          padding="0"
+                          variableRowHeight="false"/>
+        </s:layout>
+        
+        <s:FormItem label="Name:" width="100%">
+            <s:TextInput id="mapNameTextInput"
+                         width="200"
+                         change="mapNameChangeHandler(event)"/>
+        </s:FormItem>
+        
+        <s:FormItem label="Width:" width="100%">
+            <s:NumericStepper id="mapWidthNumericStepper"
+                              width="80"
+                              stepSize="8"
+                              change="mapWidthChangeHandler(event)"/>
+        </s:FormItem>
+        
+        <s:FormItem label="Height:" width="100%">
+            <s:NumericStepper id="mapHeightNumericStepper"
+                              width="80"
+                              stepSize="8"
+                              change="mapHeightChangeHandler(event)"/>
+        </s:FormItem>
+        
+        <s:FormItem label="Layers:" width="100%">
+            <s:NumericStepper id="mapLayersNumericStepper"
+                              width="80"
+                              change="mapLayersChangeHandler(event)"/>
+        </s:FormItem>
+    </s:Form>
+    
+    <ide:ShadowLine width="100%"/>
+    
+    <s:HGroup width="100%"
+              verticalAlign="middle"
+              horizontalAlign="right"
+              paddingLeft="10"
+              paddingRight="10"
+              paddingBottom="10">
+        
+        <s:Button id="confirmButton"
+                  label="Confirm"
+                  minWidth="60"
+                  enabled="false"
+                  click="confirmButtonClickHandler(event)"/>
+        
+        <s:Button id="cancelButton"
+                  label="Cancel"
+                  minWidth="60"
+                  click="close()"/>
+    </s:HGroup>
+</s:Window>

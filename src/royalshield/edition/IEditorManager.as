@@ -22,7 +22,11 @@ package royalshield.edition
         
         function get editorCount():uint;
         
-        function createMap(width:uint, height:uint, layers:uint, name:String):IMapEditor;
+        function get waiting():Boolean;
+        
+        function get changed():Boolean;
+        
+        function createMap(name:String, width:uint, height:uint, layers:uint):IMapEditor;
         function createEditor(map:IWorldMap):IMapEditor;
         function removeEditor(editor:IMapEditor):void;
         function removeCurrentEditor():void;
@@ -32,5 +36,7 @@ package royalshield.edition
         
         function undo():void;
         function redo():void;
+        
+        function createUntitledName():String;
     }
 }

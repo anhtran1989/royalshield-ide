@@ -43,9 +43,27 @@ s|Button
     skinClass: ClassReference("royalshield.components.skins.ButtonSkin");
 }
 
+s|NumericStepper
+{
+    skinClass: ClassReference("royalshield.components.skins.NumericStepperSkin");
+}
+
 s|SkinnableComponent
 {
     focusSkin: ClassReference("royalshield.components.skins.FocusSkin");
+}
+
+s|TextInput
+{
+    paddingBottom: 3;
+    paddingLeft: 3;
+    paddingRight: 3;
+    paddingTop: 5;
+    color: #272727;
+    borderColor: #272727;
+    contentBackgroundColor: #A2A2A2;
+    focusedTextSelectionColor: #CCCCCC;
+    skinClass: ClassReference("royalshield.components.skins.TextInputSkin");
 }
 
 s|ToggleButton

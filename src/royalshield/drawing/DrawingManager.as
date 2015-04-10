@@ -89,6 +89,8 @@ package royalshield.drawing
             target.addEventListener(DrawingEvent.BRUSH_PRESS, targetPressHandler);
             target.addEventListener(DrawingEvent.BRUSH_DRAG, targetDragHandler);
             target.addEventListener(DrawingEvent.BRUSH_RELEASE, targetReleaseHandler);
+            target.addEventListener(DrawingEvent.SELECTION_START, targetSelectionStartHandler);
+            target.addEventListener(DrawingEvent.SELECTION_END, targetSelectionEndHandler);
             target.addEventListener(DrawingEvent.ZOOM, targetZoomChangeHandler);
             target.addEventListener(MouseEvent.ROLL_OVER, targetRollOverHandler);
             target.addEventListener(MouseEvent.ROLL_OUT, targetRollOutHandler);
@@ -99,6 +101,8 @@ package royalshield.drawing
             target.removeEventListener(DrawingEvent.BRUSH_PRESS, targetPressHandler);
             target.removeEventListener(DrawingEvent.BRUSH_DRAG, targetDragHandler);
             target.removeEventListener(DrawingEvent.BRUSH_RELEASE, targetReleaseHandler);
+            target.removeEventListener(DrawingEvent.SELECTION_START, targetSelectionStartHandler);
+            target.removeEventListener(DrawingEvent.SELECTION_END, targetSelectionEndHandler);
             target.removeEventListener(DrawingEvent.ZOOM, targetZoomChangeHandler);
             target.removeEventListener(MouseEvent.ROLL_OVER, targetRollOverHandler);
             target.removeEventListener(MouseEvent.ROLL_OUT, targetRollOutHandler);
@@ -138,9 +142,19 @@ package royalshield.drawing
             m_brushManager.doRelease(m_currentTarget.mouseMapX, m_currentTarget.mouseMapY);
         }
         
+        private function targetSelectionStartHandler(event:DrawingEvent):void
+        {
+            m_brushManager.hideCursor();
+        }
+        
+        private function targetSelectionEndHandler(event:DrawingEvent):void
+        {
+            m_brushManager.showCursor();
+        }
+        
         private function targetZoomChangeHandler(event:DrawingEvent):void
         {
-            //dispatchEvent(new DrawingManagerEvent(DrawingManagerEvent.TARGET_ZOOM_CHANGE));
+            ////
         }
         
         private function targetRollOverHandler(event:MouseEvent):void

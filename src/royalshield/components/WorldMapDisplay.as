@@ -23,6 +23,8 @@ package royalshield.components
     [Event(name="brushMove", type="royalshield.events.DrawingEvent")]
     [Event(name="brushDrag", type="royalshield.events.DrawingEvent")]
     [Event(name="brushRelease", type="royalshield.events.DrawingEvent")]
+    [Event(name="selectionStart", type="royalshield.events.DrawingEvent")]
+    [Event(name="selectionEnd", type="royalshield.events.DrawingEvent")]
     [Event(name="zoom", type="royalshield.events.DrawingEvent")]
     
     public class WorldMapDisplay extends UIComponent implements IDrawingTarget, IDisposable
@@ -48,6 +50,7 @@ package royalshield.components
         private var m_zoom:Number;
         private var m_gridSurface:FlexShape;
         private var m_showGrid:Boolean;
+        private var m_selectionSurface:SelectionSurface;
         
         private var m_mouseMapChanged:Signal;
         
@@ -156,6 +159,9 @@ package royalshield.components
             m_gridSurface = new FlexShape();
             m_gridSurface.blendMode = BlendMode.INVERT;
             addChild(m_gridSurface);
+            
+            m_selectionSurface = new SelectionSurface();
+            addChild(m_selectionSurface);
         }
         
         override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void
@@ -296,16 +302,25 @@ package royalshield.components
             m_mouseDownY = m_mouseMapY;
             m_mouseDown = true;
             
+            if (event.ctrlKey) {
+                m_selectionSurface.startDraw(this.mouseX, this.mouseY);
+                dispatchEvent(new DrawingEvent(DrawingEvent.SELECTION_START));
+            }
+            else
+                dispatchEvent(new DrawingEvent(DrawingEvent.BRUSH_PRESS));
+            
             systemManager.stage.addEventListener(MouseEvent.MOUSE_UP, mouseUpHandler);
-            dispatchEvent(new DrawingEvent(DrawingEvent.BRUSH_PRESS));
         }
         
         protected function mouseMoveHandler(event:MouseEvent):void
         {
             refreshMouseMap();
             
-            if (m_mouseDown)
-                dispatchEvent(new DrawingEvent(DrawingEvent.BRUSH_DRAG));
+            if (m_mouseDown) {
+                m_selectionSurface.update(this.mouseX, this.mouseY);
+                if (!m_selectionSurface.selecting)
+                    dispatchEvent(new DrawingEvent(DrawingEvent.BRUSH_DRAG));
+            }
         }
         
         protected function mouseUpHandler(event:MouseEvent):void
@@ -314,9 +329,14 @@ package royalshield.components
             m_mouseDownY = uint.MAX_VALUE;
             
             if (m_mouseDown) {
+                if (m_selectionSurface.selecting)
+                    dispatchEvent(new DrawingEvent(DrawingEvent.SELECTION_END));
+                else
+                    dispatchEvent(new DrawingEvent(DrawingEvent.BRUSH_RELEASE));
+                
                 m_mouseDown = false;
                 systemManager.stage.addEventListener(MouseEvent.MOUSE_UP, mouseUpHandler);
-                dispatchEvent(new DrawingEvent(DrawingEvent.BRUSH_RELEASE));
+                m_selectionSurface.clear();
             }
         }
         
