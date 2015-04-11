@@ -301,6 +301,7 @@ package royalshield.components
         {
             m_changed = true;
             this.label = m_map.name + " *";
+            this.mapDisplay.draw();
         }
         
         override protected function keyDownHandler(event:KeyboardEvent):void
