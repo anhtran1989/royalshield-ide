@@ -110,6 +110,12 @@ package royalshield.brushes
                 m_brush.hideCursor();
         }
         
+        public function invalidateCursor():void
+        {
+            this.hideCursor();
+            this.showCursor();
+        }
+        
         //--------------------------------------
         // Private
         //--------------------------------------

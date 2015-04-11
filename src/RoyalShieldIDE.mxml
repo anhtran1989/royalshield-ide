@@ -183,6 +183,14 @@
                         m_editorManager.redo();
                         break;
                     
+                    case IDEMenu.VIEW_ZOOM_IN:
+                        m_editorManager.zoomIn();
+                        break;
+                    
+                    case IDEMenu.VIEW_ZOOM_OUT:
+                        m_editorManager.zoomOut();
+                        break;
+                    
                     case IDEMenu.VIEW_SHOW_GRID:
                         m_editorManager.showGrid = !m_editorManager.showGrid;
                         break;

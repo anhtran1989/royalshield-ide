@@ -244,10 +244,10 @@ package royalshield.components.menu
             nativeMenu.items[(index + 1)].submenu.items[1].enabled = m_application.editorManager.canRedo;
             
             // menu View > Zoom in
-            nativeMenu.items[(index + 2)].submenu.items[0].enabled = false;
+            nativeMenu.items[(index + 2)].submenu.items[0].enabled = m_application.editorManager.canZoomIn;
             
             // menu View > Zoom Out
-            nativeMenu.items[(index + 2)].submenu.items[1].enabled = false;
+            nativeMenu.items[(index + 2)].submenu.items[1].enabled = m_application.editorManager.canZoomOut;
             
             // menu View > Show Grid
             nativeMenu.items[(index + 2)].submenu.items[3].checked = m_application.editorManager.showGrid;

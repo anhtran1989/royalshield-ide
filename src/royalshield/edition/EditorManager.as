@@ -9,6 +9,7 @@ package royalshield.edition
     
     import royalshield.components.Alert;
     import royalshield.components.MapEditor;
+    import royalshield.components.WorldMapDisplay;
     import royalshield.core.IRoyalShieldIDE;
     import royalshield.errors.NullArgumentError;
     import royalshield.errors.NullOrEmptyArgumentError;
@@ -62,6 +63,9 @@ package royalshield.edition
         
         public function get canUndo():Boolean { return m_currentHistoryManager ? m_currentHistoryManager.canUndo : false; }
         public function get canRedo():Boolean { return m_currentHistoryManager ? m_currentHistoryManager.canRedo : false; }
+        
+        public function get canZoomIn():Boolean { return m_currentEditor && m_currentEditor.display.zoom != WorldMapDisplay.MAX_ZOOM; }
+        public function get canZoomOut():Boolean { return m_currentEditor && m_currentEditor.display.zoom != WorldMapDisplay.MIN_ZOOM; }
         
         public function get showGrid():Boolean { return m_showGrid; }
         public function set showGrid(value:Boolean):void
@@ -242,6 +246,18 @@ package royalshield.edition
         {
             if (m_currentHistoryManager)
                 m_currentHistoryManager.redo();
+        }
+        
+        public function zoomIn():void
+        {
+            if (m_currentEditor)
+                m_currentEditor.zoomIn();
+        }
+        
+        public function zoomOut():void
+        {
+            if (m_currentEditor)
+                m_currentEditor.zoomOut();
         }
         
         public function createUntitledName():String

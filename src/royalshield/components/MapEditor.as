@@ -10,6 +10,7 @@ package royalshield.components
     import flash.utils.Timer;
     
     import mx.core.FlexGlobals;
+    import mx.core.UIComponent;
     import mx.events.ResizeEvent;
     
     import spark.components.Button;
@@ -17,7 +18,6 @@ package royalshield.components
     import spark.components.NavigatorContent;
     import spark.components.VScrollBar;
     
-    import royalshield.core.GameConsts;
     import royalshield.core.IRoyalShieldIDE;
     import royalshield.edition.IMapEditor;
     import royalshield.events.DrawingEvent;
@@ -35,6 +35,9 @@ package royalshield.components
         //--------------------------------------------------------------------------
         // PROPERTIES
         //--------------------------------------------------------------------------
+        
+        [SkinPart(required="true", type="mx.core.UIComponent")]
+        public var mapDisplayMask:UIComponent;
         
         [SkinPart(required="true", type="royalshield.components.WorldMapDisplay")]
         public var mapDisplay:WorldMapDisplay;
@@ -113,46 +116,56 @@ package royalshield.components
         // Public
         //--------------------------------------
         
-        public function onMoveMapNorth():void
+        public function moveMapNorth():void
         {
             if (m_map)
                 m_map.setPosition(m_map.x, Math.max(0, m_map.y - 1), m_map.z);
         }
         
-        public function onMoveMapSouth():void
+        public function moveMapSouth():void
         {
             if (m_map)
                 m_map.setPosition(m_map.x, Math.min(verticalScrollBar.maximum, m_map.y + 1), m_map.z);
         }
         
-        public function onMoveMapWest():void
+        public function moveMapWest():void
         {
             if (m_map)
                 m_map.setPosition(Math.max(0, m_map.x - 1), m_map.y, m_map.z);
         }
         
-        public function onMoveMapEast():void
+        public function moveMapEast():void
         {
             if (m_map)
                 m_map.setPosition(Math.min(horizontalScrollBar.maximum, m_map.x + 1), m_map.y, m_map.z);
         }
         
-        public function onLayerUp():void
+        public function layerUp():void
         {
             if (m_map)
                 m_map.setPosition(m_map.x, m_map.y, Math.min(m_map.layers - 1, m_map.z + 1));
         }
         
-        public function onLayerDown():void
+        public function layerDown():void
         {
             if (m_map)
                 m_map.setPosition(m_map.x, m_map.y, Math.max(0, m_map.z - 1));
         }
         
-        public function onCentralizeMap():void
+        public function centralizeMap():void
         {
             if (m_map)
                 m_map.setPosition(uint(horizontalScrollBar.maximum * 0.5), uint(verticalScrollBar.maximum * 0.5), m_map.z);
+        }
+        
+        public function zoomIn():void
+        {
+            display.zoom += 0.1;
+        }
+        
+        public function zoomOut():void
+        {
+            display.zoom -= 0.1;
         }
         
         public function dispose():void
@@ -226,8 +239,8 @@ package royalshield.components
         private function updateScrollBarValues():void
         {
             if (m_map) {
-                horizontalScrollBar.maximum = m_map.width - int(mapDisplay.width / GameConsts.VIEWPORT_TILE_SIZE * mapDisplay.zoom);
-                verticalScrollBar.maximum = m_map.height - int(mapDisplay.height / GameConsts.VIEWPORT_TILE_SIZE * mapDisplay.zoom);
+                horizontalScrollBar.maximum = m_map.width - int(mapDisplayMask.width / mapDisplay.measuredTileSize);
+                verticalScrollBar.maximum = m_map.height - int(mapDisplayMask.height / mapDisplay.measuredTileSize);
             }
         }
         
@@ -267,7 +280,7 @@ package royalshield.components
         
         protected function centralizeButtonClickHandler(event:MouseEvent):void
         {
-            this.onCentralizeMap();
+            this.centralizeMap();
         }
         
         protected function scrollbarChangeHandler(event:Event):void
@@ -278,6 +291,9 @@ package royalshield.components
         protected function mapDisplayZoomHandler(event:DrawingEvent):void
         {
             this.updateScrollBarValues();
+            
+            if (!m_timer.running)
+                m_timer.start();
         }
         
         protected function mapDisplayResizeHandler(event:ResizeEvent):void
@@ -311,27 +327,27 @@ package royalshield.components
                 switch(keyCode)
                 {
                     case Keyboard.UP:
-                        this.onMoveMapNorth();
+                        this.moveMapNorth();
                         break;
                     
                     case Keyboard.DOWN:
-                        this.onMoveMapSouth();
+                        this.moveMapSouth();
                         break;
                     
                     case Keyboard.LEFT:
-                        this.onMoveMapWest();
+                        this.moveMapWest();
                         break;
                     
                     case Keyboard.RIGHT:
-                        this.onMoveMapEast();
+                        this.moveMapEast();
                         break;
                     
                     case Keyboard.PAGE_UP:
-                        this.onLayerUp();
+                        this.layerUp();
                         break;
                     
                     case Keyboard.PAGE_DOWN:
-                        this.onLayerDown();
+                        this.layerDown();
                         break;
                     
                     case Keyboard.DELETE:
@@ -347,6 +363,14 @@ package royalshield.components
                     
                     case Keyboard.Y:
                         m_historyManager.redo();
+                        break;
+                    
+                    case Keyboard.EQUAL:
+                        this.zoomIn();
+                        break;
+                    
+                    case Keyboard.MINUS:
+                        this.zoomOut();
                         break;
                 }
             }

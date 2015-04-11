@@ -29,5 +29,6 @@ package royalshield.brushes
         
         function showCursor():void;
         function hideCursor():void;
+        function invalidateCursor():void;
     }
 }

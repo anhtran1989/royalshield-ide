@@ -219,7 +219,7 @@ package royalshield.drawing
         
         private function targetZoomChangeHandler(event:DrawingEvent):void
         {
-            ////
+            m_brushManager.invalidateCursor();
         }
         
         private function targetRollOverHandler(event:MouseEvent):void

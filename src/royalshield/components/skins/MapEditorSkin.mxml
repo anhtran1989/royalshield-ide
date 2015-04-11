@@ -29,11 +29,18 @@
     <!-- content -->
     <s:Group id="contentGroup" left="0" right="0" top="0" bottom="0" minWidth="0" minHeight="0">
         
+        <ide:MapDisplayMask id="mapDisplayMask"
+                            left="0"
+                            right="17"
+                            top="0"
+                            bottom="17"/>
+        
         <ide:WorldMapDisplay id="mapDisplay"
                              left="0"
                              right="17"
                              top="0"
-                             bottom="17"/>
+                             bottom="17"
+                             mask="{mapDisplayMask}"/>
         
         <s:HScrollBar id="horizontalScrollBar"
                       focusEnabled="false"

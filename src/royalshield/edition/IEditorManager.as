@@ -17,6 +17,9 @@ package royalshield.edition
         function get canUndo():Boolean;
         function get canRedo():Boolean;
         
+        function get canZoomIn():Boolean;
+        function get canZoomOut():Boolean;
+        
         function get showGrid():Boolean;
         function set showGrid(value:Boolean):void;
         
@@ -39,6 +42,9 @@ package royalshield.edition
         
         function undo():void;
         function redo():void;
+        
+        function zoomIn():void;
+        function zoomOut():void;
         
         function createUntitledName():String;
     }

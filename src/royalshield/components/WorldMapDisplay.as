@@ -392,8 +392,8 @@ package royalshield.components
         // STATIC
         //--------------------------------------------------------------------------
         
-        static private const MIN_ZOOM:Number = 1.0;
-        static private const MAX_ZOOM:Number = 3.0;
+        static public const MIN_ZOOM:Number = 1.0;
+        static public const MAX_ZOOM:Number = 3.0;
         static private const CANVAS_WIDTH:uint = 1024;
         static private const CANVAS_HEIGHT:uint = 1024;
         static private const CANVAS:GameCanvas = new GameCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);

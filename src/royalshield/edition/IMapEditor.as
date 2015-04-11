@@ -24,12 +24,15 @@ package royalshield.edition
         
         function get changed():Boolean;
         
-        function onMoveMapNorth():void;
-        function onMoveMapSouth():void;
-        function onMoveMapWest():void;
-        function onMoveMapEast():void;
-        function onLayerUp():void;
-        function onLayerDown():void;
-        function onCentralizeMap():void;
+        function moveMapNorth():void;
+        function moveMapSouth():void;
+        function moveMapWest():void;
+        function moveMapEast():void;
+        function layerUp():void;
+        function layerDown():void;
+        function centralizeMap():void;
+        
+        function zoomIn():void;
+        function zoomOut():void;
     }
 }
