@@ -263,7 +263,7 @@ package royalshield.components
             var length:uint = tile.itemCount;
             var item:Item;
             
-            CANVAS.useAlphaBitmapData = (m_drawingManager.selectedTileCount != 0 && m_drawingManager.selectedTiles[tile] !== undefined);
+            CANVAS.useAlphaBitmapData = m_drawingManager.selectedTiles.hasTile(tile, this);
             for (var i:int = 0; i < length; i++) {
                 item = tile.getItemAt(i);
                 if (item)
@@ -383,7 +383,7 @@ package royalshield.components
                     dispatchEvent(new DrawingEvent(DrawingEvent.BRUSH_RELEASE));
                 
                 m_mouseDown = false;
-                systemManager.stage.addEventListener(MouseEvent.MOUSE_UP, mouseUpHandler);
+                systemManager.stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUpHandler);
                 m_selectionSurface.clear();
             }
             

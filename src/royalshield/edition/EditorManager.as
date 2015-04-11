@@ -278,7 +278,7 @@ package royalshield.edition
                 m_currentHistoryManager = editor.historyManager;
                 editor.display.showGrid = this.showGrid;
                 editor.display.showMouseTile = this.showMouseTile;
-                editor.display.invalidateDisplayList();
+                editor.display.draw();
                 dispatchEvent(new EditorManagerEvent(EditorManagerEvent.EDITOR_CHANGED, editor));
             }
         }

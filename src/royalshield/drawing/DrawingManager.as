@@ -29,16 +29,14 @@ package royalshield.drawing
         private var m_currentTarget:IDrawingTarget;
         private var m_brushManager:IBrushManager;
         private var m_editorManager:IEditorManager;
-        private var m_selectedTiles:Dictionary;
-        private var m_selectedTileCount:uint;
+        private var m_selectedTiles:SelectedTiles;
         
         //--------------------------------------
         // Getters / Setters
         //--------------------------------------
         
         public function get currentTarget():IDrawingTarget { return m_currentTarget; }
-        public function get selectedTiles():Dictionary { return m_selectedTiles; }
-        public function get selectedTileCount():uint { return m_selectedTileCount; }
+        public function get selectedTiles():SelectedTiles { return m_selectedTiles; }
         
         //--------------------------------------------------------------------------
         // CONSTRUCTOR
@@ -55,6 +53,7 @@ package royalshield.drawing
             m_editorManager.addEventListener(EditorManagerEvent.EDITOR_CREATED, editorManagerCreatedHandler);
             m_editorManager.addEventListener(EditorManagerEvent.EDITOR_CHANGED, editorManagerChangedHandler);
             m_editorManager.addEventListener(EditorManagerEvent.EDITOR_REMOVED, editorManagerRemovedHandler);
+            m_selectedTiles = new SelectedTiles();
         }
         
         //--------------------------------------------------------------------------
@@ -92,19 +91,21 @@ package royalshield.drawing
         
         public function onDeleteSelectedTiles():void
         {
-            if (m_selectedTileCount == 0) return;
-            
-            var tiles:Vector.<Tile> = new Vector.<Tile>();
-            for (var tile:* in m_selectedTiles) {
-                if (m_currentTarget.worldMap.deleteTile(tile) && tile.itemCount != 0)
-                    tiles[tiles.length] = tile;
-            }
-            
-            if (tiles.length != 0) {
-                var description:String = StringUtil.format("Deleted {0} tile{1}", tiles.length, tiles.length > 1 ? "s" : "");
-                var group:HistoryActionGroup = new HistoryActionGroup(description);
-                group.addAction(new TileMapHistoryAction(tiles));
-                m_editorManager.currentHistoryManager.addActionGroup(group);
+            var selectedList:Dictionary = m_selectedTiles.getList(m_currentTarget);
+            if (selectedList) {
+                var tiles:Vector.<Tile> = new Vector.<Tile>();
+                for (var tile:* in selectedList) {
+                    if (m_currentTarget.worldMap.deleteTile(tile) && tile.itemCount != 0)
+                        tiles[tiles.length] = tile;
+                }
+                
+                if (tiles.length != 0) {
+                    var description:String = StringUtil.format("Deleted {0} tile{1}", tiles.length, tiles.length > 1 ? "s" : "");
+                    var group:HistoryActionGroup = new HistoryActionGroup(description);
+                    group.addAction(new TileMapHistoryAction(tiles));
+                    m_editorManager.currentHistoryManager.addActionGroup(group);
+                }
+                
             }
             
             onClearSelection();
@@ -142,10 +143,8 @@ package royalshield.drawing
         {
             if (!m_currentTarget) return;
             
-            if (!m_selectedTiles || !m_currentTarget.shiftDown) {
-                m_selectedTiles = new Dictionary();
-                m_selectedTileCount = 0;
-            }
+            if (!m_selectedTiles || !m_currentTarget.shiftDown)
+                m_selectedTiles.clear(m_currentTarget);
             
             var minx:uint = Math.min(m_currentTarget.mouseMapX, m_currentTarget.mouseDownX);
             var miny:uint = Math.min(m_currentTarget.mouseMapY, m_currentTarget.mouseDownY);
@@ -156,18 +155,15 @@ package royalshield.drawing
             for (var x:uint = minx; x <= maxx; x++) {
                 for (var y:uint = miny; y <= maxy; y++) {
                     var tile:Tile = map.getTile(x, y, map.z);
-                    if (tile) {
-                        m_selectedTiles[tile] = true;
-                        m_selectedTileCount++;
-                    }
+                    if (tile)
+                        m_selectedTiles.addTile(tile, m_currentTarget);
                 }
             }
         }
         
         private function onClearSelection():void
         {
-            m_selectedTiles = null;
-            m_selectedTileCount = 0;
+            m_selectedTiles.clear(m_currentTarget);
         }
         
         //--------------------------------------
