@@ -33,7 +33,6 @@ package royalshield.brushes
         private var m_type:String;
         private var m_itemId:uint;
         private var m_size:uint;
-        private var m_zoom:Number;
         private var m_cursorId:uint;
         private var m_cursor:Shape;
         private var m_actions:Vector.<ItemMapHistoryAction>;
@@ -50,9 +49,6 @@ package royalshield.brushes
         public function get size():uint { return m_size; }
         public function set size(value:uint):void { m_size = value; }
         
-        public function get zoom():Number { return m_zoom; }
-        public function set zoom(value:Number):void { m_zoom = value; }
-        
         public function get brushManager():IBrushManager { return m_brushManager; }
         public function set brushManager(value:IBrushManager):void { m_brushManager = value; }
         
@@ -63,7 +59,6 @@ package royalshield.brushes
         public function Brush()
         {
             m_size = 1;
-            m_zoom = 1.0;
             m_type = BrushType.BRUSH;
             m_actions = new Vector.<ItemMapHistoryAction>();
         }
@@ -97,7 +92,7 @@ package royalshield.brushes
                 return;
             
             m_lastTile = tile;
-            if (m_lastTile.addItem(item)){
+            if (tile.queryAdd(item) && tile.addItem(item)){
                 var index:int = tile.indexOfItem(item);
                 m_actions[m_actions.length] = new ItemMapHistoryAction(null, new Position(tile.x, tile.y, tile.z), item, -1, index);
             }

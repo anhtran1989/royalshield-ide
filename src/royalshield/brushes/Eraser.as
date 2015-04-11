@@ -1,12 +1,9 @@
 package royalshield.brushes
 {
-    import flash.display.BitmapData;
-    import flash.display.BlendMode;
     import flash.display.Shape;
     
     import mx.managers.CursorManagerPriority;
     
-    import royalshield.core.GameAssets;
     import royalshield.drawing.IDrawingTarget;
     import royalshield.edition.EditorManager;
     import royalshield.entities.items.Item;
@@ -26,7 +23,6 @@ package royalshield.brushes
         private var m_lastTile:Tile;
         private var m_type:String;
         private var m_size:uint;
-        private var m_zoom:Number;
         private var m_cursorId:uint;
         private var m_cursor:Shape;
         private var m_actions:Vector.<ItemMapHistoryAction>;
@@ -43,9 +39,6 @@ package royalshield.brushes
         public function get size():uint { return m_size; }
         public function set size(value:uint):void { m_size = value; }
         
-        public function get zoom():Number { return m_zoom; }
-        public function set zoom(value:Number):void { m_zoom = value; }
-        
         public function get brushManager():IBrushManager { return m_brushManager; }
         public function set brushManager(value:IBrushManager):void { m_brushManager = value; }
         
@@ -56,7 +49,6 @@ package royalshield.brushes
         public function Eraser()
         {
             m_size = 1;
-            m_zoom = 1.0;
             m_type = BrushType.ERASER;
             m_actions = new Vector.<ItemMapHistoryAction>();
         }
@@ -117,19 +109,14 @@ package royalshield.brushes
             m_cursorId = m_brushManager.cursorManager.setCursor(Shape, CursorManagerPriority.HIGH);
             m_cursor = m_brushManager.cursorManager.currentCursor as Shape;
             if (m_cursor) {
-                var texture:BitmapData = GameAssets.getInstance().getObjectTexturePreview(0, null);
-                m_cursor.graphics.beginBitmapFill(texture);
-                m_cursor.graphics.drawRect(0, 0, texture.width, texture.height);
-                m_cursor.blendMode = BlendMode.INVERT;
+                var size:Number = m_brushManager.target.measuredTileSize;
+                m_cursor.graphics.clear();
+                m_cursor.graphics.beginFill(0xFF0000);
+                m_cursor.graphics.drawRect(0, 0, size, size);
+                m_cursor.graphics.endFill();
                 m_cursor.alpha = 0.5;
-                
-                if (texture.width >= 64) {
-                    m_brushManager.cursorManager.currentCursorXOffset = -(texture.width - 16);
-                    m_brushManager.cursorManager.currentCursorYOffset = -(texture.height - 16);
-                } else {
-                    m_brushManager.cursorManager.currentCursorXOffset = -(texture.width * 0.5);
-                    m_brushManager.cursorManager.currentCursorYOffset = -(texture.height * 0.5);
-                }
+                m_brushManager.cursorManager.currentCursorXOffset = -(size * 0.5);
+                m_brushManager.cursorManager.currentCursorYOffset = -(size * 0.5);
             }
         }
         

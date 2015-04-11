@@ -10,9 +10,6 @@ package royalshield.brushes
         function get size():uint;
         function set size(value:uint):void;
         
-        function get zoom():Number;
-        function set zoom(value:Number):void;
-        
         function get brushManager():IBrushManager;
         function set brushManager(value:IBrushManager):void;
         

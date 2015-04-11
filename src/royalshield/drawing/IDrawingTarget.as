@@ -22,6 +22,8 @@ package royalshield.drawing
         function get zoom():Number;
         function set zoom(value:Number):void;
         
+        function get measuredTileSize():Number;
+        
         function draw():void;
     }
 }

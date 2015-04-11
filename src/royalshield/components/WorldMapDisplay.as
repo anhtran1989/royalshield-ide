@@ -53,6 +53,7 @@ package royalshield.components
         private var m_ctrlDown:Boolean;
         private var m_shiftDown:Boolean;
         private var m_zoom:Number;
+        private var m_measuredTileSize:Number;
         private var m_gridSurface:FlexShape;
         private var m_mouseTileSurface:FlexShape;
         private var m_selectionSurface:SelectionSurface;
@@ -98,20 +99,18 @@ package royalshield.components
         public function get zoom():Number { return m_zoom; }
         public function set zoom(value:Number):void
         {
-            if (isNaN(value))
-                value = MIN_ZOOM;
-            else if (value < MIN_ZOOM)
-                value = MIN_ZOOM;
-            else if (value > MAX_ZOOM)
-                value = MAX_ZOOM;
+            value = (isNaN(value) || value < MIN_ZOOM) ? MIN_ZOOM : Math.min(MAX_ZOOM, value);
             
             if (m_zoom != value) {
                 m_zoom = value;
+                m_measuredTileSize = GameConsts.VIEWPORT_TILE_SIZE * m_zoom;
                 invalidateDisplayList();
                 invalidateSize();
                 dispatchEvent(new DrawingEvent(DrawingEvent.ZOOM));
             }
         }
+        
+        public function get measuredTileSize():Number { return m_measuredTileSize; }
         
         public function get showGrid():Boolean { return m_showGrid; }
         public function set showGrid(value:Boolean):void
@@ -145,6 +144,7 @@ package royalshield.components
             
             m_matrix = new Matrix();
             m_zoom = 1.0;
+            m_measuredTileSize = GameConsts.VIEWPORT_TILE_SIZE;
             
             m_mouseMapChanged = new Signal();
             
@@ -204,8 +204,8 @@ package royalshield.components
             var w:Number = Math.min(CANVAS_WIDTH, unscaledWidth);
             var h:Number = Math.min(CANVAS_HEIGHT, unscaledHeight);
             
-            m_viewportX = int(w / (GameConsts.VIEWPORT_TILE_SIZE * m_zoom)) + 1;
-            m_viewportY = int(h / (GameConsts.VIEWPORT_TILE_SIZE * m_zoom)) + 1;
+            m_viewportX = int(w / m_measuredTileSize) + 1;
+            m_viewportY = int(h / m_measuredTileSize) + 1;
             m_tilesSum = m_viewportX + m_viewportY;
             m_tilesTotal = m_viewportX * m_viewportY;
             m_matrix.a = m_zoom;
@@ -276,12 +276,10 @@ package royalshield.components
             var g:Graphics = m_gridSurface.graphics;
             g.clear();
             if (m_showGrid) {
-                var size:Number = GameConsts.VIEWPORT_TILE_SIZE * m_zoom;
-                
                 g.lineStyle(0.5, 0x000000, 0.1);
                 for (var x:int = 0; x < m_viewportX; x++) {
                     for (var y:int = 0; y < m_viewportY; y++) {
-                        g.drawRect(x * size, y * size, size, size);
+                        g.drawRect(x * m_measuredTileSize, y * m_measuredTileSize, m_measuredTileSize, m_measuredTileSize);
                     }
                 }
                 g.endFill();
@@ -293,12 +291,11 @@ package royalshield.components
             var g:Graphics = m_mouseTileSurface.graphics;
             g.clear();
             if (m_showMouseTile) {
-                var size:Number = GameConsts.VIEWPORT_TILE_SIZE * m_zoom;
-                var x:Number = Math.floor(this.mouseX / size) * size;
-                var y:Number = Math.floor(this.mouseY / size) * size;
+                var x:Number = Math.floor(this.mouseX / m_measuredTileSize) * m_measuredTileSize;
+                var y:Number = Math.floor(this.mouseY / m_measuredTileSize) * m_measuredTileSize;
                 if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
                     g.lineStyle(0.5, 0x000000, 0.6);
-                    g.drawRect(x, y, size, size);
+                    g.drawRect(x, y, m_measuredTileSize, m_measuredTileSize);
                     g.endFill();
                 }
             }
@@ -306,12 +303,11 @@ package royalshield.components
         
         private function refreshMouseMap():void
         {
-            var size:Number = GameConsts.VIEWPORT_TILE_SIZE * m_zoom;
-            var posx:int = int(this.mouseX / size);
+            var posx:int = int(this.mouseX / m_measuredTileSize);
             if (posx < 0 || posx > m_viewportX)
                 return;
             
-            var posy:int = int(this.mouseY / size);
+            var posy:int = int(this.mouseY / m_measuredTileSize);
             if (posy < 0 || posy > m_viewportY)
                 return;
             

@@ -23,7 +23,6 @@ package royalshield.brushes
         private var m_brushType:String;
         private var m_brush:IBrush;
         private var m_itemId:uint;
-        private var m_zoom:Number;
         private var m_cursorManager:ICursorManager;
         
         //--------------------------------------
@@ -138,7 +137,6 @@ package royalshield.brushes
             
             if (m_brush) {
                 m_brush.itemId = m_itemId;
-                m_brush.zoom = m_zoom;
                 m_brush.brushManager = this;
                 
                 this.showCursor();
