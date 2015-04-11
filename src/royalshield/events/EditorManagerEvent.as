@@ -43,5 +43,6 @@ package royalshield.events
         static public const EDITOR_CREATED:String = "editorCreated";
         static public const EDITOR_CHANGED:String = "editorChanged";
         static public const EDITOR_REMOVED:String = "editorRemoved";
+        static public const MAP_CHANGED:String = "mapChanged";
     }
 }

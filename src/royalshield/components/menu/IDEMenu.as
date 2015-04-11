@@ -8,6 +8,7 @@ package royalshield.components.menu
     import mx.events.FlexNativeMenuEvent;
     
     import royalshield.core.IRoyalShieldIDE;
+    import royalshield.edition.IEditorManager;
     import royalshield.events.MenuEvent;
     import royalshield.utils.CapabilitiesUtil;
     import royalshield.utils.DescriptorUtil;
@@ -21,6 +22,7 @@ package royalshield.components.menu
         //--------------------------------------------------------------------------
         
         private var m_application:IRoyalShieldIDE;
+        private var m_editorManager:IEditorManager;
         private var m_isMac:Boolean;
         
         //--------------------------------------------------------------------------
@@ -218,6 +220,7 @@ package royalshield.components.menu
         protected function creationCompleteHandler(event:Event):void
         {
             m_application.removeEventListener(FlexEvent.CREATION_COMPLETE, creationCompleteHandler);
+            m_editorManager = m_application.editorManager;
             create();
         }
         
@@ -232,28 +235,28 @@ package royalshield.components.menu
             var index:uint = m_isMac ? 1 : 0;
             
             // menu File > Save
-            nativeMenu.items[index].submenu.items[2].enabled = false;
+            nativeMenu.items[index].submenu.items[2].enabled = (m_editorManager.currentEditor && m_editorManager.currentEditor.changed);
             
             // menu File > Save As
-            nativeMenu.items[index].submenu.items[3].enabled = false;
+            nativeMenu.items[index].submenu.items[3].enabled = (m_editorManager.currentEditor != null);
             
             // menu Edit > Undo
-            nativeMenu.items[(index + 1)].submenu.items[0].enabled = m_application.editorManager.canUndo;
+            nativeMenu.items[(index + 1)].submenu.items[0].enabled = m_editorManager.canUndo;
             
             // menu Edit > Redo
-            nativeMenu.items[(index + 1)].submenu.items[1].enabled = m_application.editorManager.canRedo;
+            nativeMenu.items[(index + 1)].submenu.items[1].enabled = m_editorManager.canRedo;
             
             // menu View > Zoom in
-            nativeMenu.items[(index + 2)].submenu.items[0].enabled = m_application.editorManager.canZoomIn;
+            nativeMenu.items[(index + 2)].submenu.items[0].enabled = m_editorManager.canZoomIn;
             
             // menu View > Zoom Out
-            nativeMenu.items[(index + 2)].submenu.items[1].enabled = m_application.editorManager.canZoomOut;
+            nativeMenu.items[(index + 2)].submenu.items[1].enabled = m_editorManager.canZoomOut;
             
             // menu View > Show Grid
-            nativeMenu.items[(index + 2)].submenu.items[3].checked = m_application.editorManager.showGrid;
+            nativeMenu.items[(index + 2)].submenu.items[3].checked = m_editorManager.showGrid;
             
             // menu View > Show Tile
-            nativeMenu.items[(index + 2)].submenu.items[4].checked = m_application.editorManager.showMouseTile;
+            nativeMenu.items[(index + 2)].submenu.items[4].checked = m_editorManager.showMouseTile;
         }
         
         //--------------------------------------------------------------------------

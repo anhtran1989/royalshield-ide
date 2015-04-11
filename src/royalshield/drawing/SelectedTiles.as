@@ -30,29 +30,29 @@ package royalshield.drawing
         // Public
         //--------------------------------------
         
-        public function addTile(tile:Tile, editor:IDrawingTarget):void
+        public function addTile(tile:Tile, target:IDrawingTarget):void
         {
-            this.getSlot(editor, true).addTile(tile);
+            this.getSlot(target, true).addTile(tile);
         }
         
-        public function hasTile(tile:Tile, editor:IDrawingTarget):Boolean
+        public function hasTile(tile:Tile, target:IDrawingTarget):Boolean
         {
-            var slot:Slot = getSlot(editor);
+            var slot:Slot = getSlot(target);
             return slot ? slot.hasTile(tile) : false;
         }
         
-        public function getList(editor:IDrawingTarget):Dictionary
+        public function getList(target:IDrawingTarget):Dictionary
         {
-            var slot:Slot = getSlot(editor);
+            var slot:Slot = getSlot(target);
             return slot ? slot.tiles : null;
         }
         
-        public function clear(editor:IDrawingTarget):void
+        public function clear(target:IDrawingTarget):void
         {
-            var slot:Slot = getSlot(editor);
+            var slot:Slot = getSlot(target);
             if (slot) {
                 slot.dispose();
-                delete m_slots[editor];
+                delete m_slots[target];
             }
         }
         
@@ -60,13 +60,13 @@ package royalshield.drawing
         // Private
         //--------------------------------------
         
-        private function getSlot(editor:IDrawingTarget, create:Boolean = false):Slot
+        private function getSlot(target:IDrawingTarget, create:Boolean = false):Slot
         {
-            if (m_slots[editor] !== undefined)
-                return Slot(m_slots[editor]);
+            if (m_slots[target] !== undefined)
+                return Slot(m_slots[target]);
             else if (create) {
                 var slot:Slot = new Slot();
-                m_slots[editor] = slot;
+                m_slots[target] = slot;
                 return slot;
             }
             

@@ -38,11 +38,19 @@
                 m_editorManager.addEventListener(EditorManagerEvent.EDITOR_CREATED, editorManagerHandler);
                 m_editorManager.addEventListener(EditorManagerEvent.EDITOR_CHANGED, editorManagerHandler);
                 m_editorManager.addEventListener(EditorManagerEvent.EDITOR_REMOVED, editorManagerHandler);
+                m_editorManager.addEventListener(EditorManagerEvent.MAP_CHANGED, mapChangedHandler);
             }
             
             protected function editorManagerHandler(event:EditorManagerEvent):void
             {
                 historyControl.historyManager = m_editorManager.currentHistoryManager;
+                saveButton.enabled = (m_editorManager.currentEditor && m_editorManager.currentEditor.changed);
+                saveAsButton.enabled = (m_editorManager.currentEditor != null);
+            }
+            
+            protected function mapChangedHandler(event:EditorManagerEvent):void
+            {
+                saveButton.enabled = event.editor.changed;
             }
             
             protected function newButtonClickHandler(event:MouseEvent):void

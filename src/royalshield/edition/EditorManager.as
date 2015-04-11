@@ -15,6 +15,7 @@ package royalshield.edition
     import royalshield.errors.NullOrEmptyArgumentError;
     import royalshield.errors.SingletonClassError;
     import royalshield.events.EditorManagerEvent;
+    import royalshield.events.HistoryEvent;
     import royalshield.events.MapPositionEvent;
     import royalshield.history.IHistoryManager;
     import royalshield.utils.StringUtil;
@@ -26,6 +27,7 @@ package royalshield.edition
     [Event(name="editorCreated", type="royalshield.events.EditorManagerEvent")]
     [Event(name="editorChanged", type="royalshield.events.EditorManagerEvent")]
     [Event(name="editorClosed", type="royalshield.events.EditorManagerEvent")]
+    [Event(name="mapChanged", type="royalshield.events.EditorManagerEvent")]
     [Event(name="mousePosition", type="royalshield.events.MapPositionEvent")]
     
     public class EditorManager extends EventDispatcher implements IEditorManager
@@ -148,6 +150,7 @@ package royalshield.edition
                 editor.map = map;
                 editor.addEventListener(FlexEvent.CREATION_COMPLETE, editorCreationCompleteHandler);
                 editor.addEventListener(MapPositionEvent.MOUSE_POSITION, mousePositionHandler);
+                editor.historyManager.addEventListener(HistoryEvent.LIST_CHANGE, historyChangedHandler);
                 
                 m_editors[m_editors.length] = editor;
                 
@@ -307,6 +310,7 @@ package royalshield.edition
                 
                 editor.removeEventListener(FlexEvent.CREATION_COMPLETE, editorCreationCompleteHandler);
                 editor.removeEventListener(MapPositionEvent.MOUSE_POSITION, mousePositionHandler);
+                editor.historyManager.removeEventListener(HistoryEvent.LIST_CHANGE, historyChangedHandler);
                 editor.dispose();
                 
                 if (m_currentEditor == editor)
@@ -333,6 +337,12 @@ package royalshield.edition
         protected function mousePositionHandler(event:MapPositionEvent):void
         {
             dispatchEvent(event);
+        }
+        
+        protected function historyChangedHandler(event:HistoryEvent):void
+        {
+            if (m_currentEditor && m_currentEditor.historyManager == event.target)
+                dispatchEvent(new EditorManagerEvent(EditorManagerEvent.MAP_CHANGED, m_currentEditor));
         }
         
         //--------------------------------------------------------------------------

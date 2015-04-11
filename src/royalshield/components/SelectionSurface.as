@@ -4,6 +4,7 @@ package royalshield.components
     
     import mx.core.UIComponent;
     
+    [ExcludeClass]
     public class SelectionSurface extends UIComponent
     {
         //--------------------------------------------------------------------------
