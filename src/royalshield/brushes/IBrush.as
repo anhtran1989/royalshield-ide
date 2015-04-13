@@ -1,6 +1,8 @@
 package royalshield.brushes
 {
-    public interface IBrush
+    import royalshield.utils.IDisposable;
+    
+    public interface IBrush extends IDisposable
     {
         function get type():String;
         

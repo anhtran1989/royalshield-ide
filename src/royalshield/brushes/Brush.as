@@ -148,6 +148,18 @@ package royalshield.brushes
             }
         }
         
+        public function dispose():void
+        {
+            m_brushManager = null;
+            m_lastTile = null;
+            m_type = null;
+            m_itemId = 0;
+            m_size = 0;
+            m_cursorId = 0;
+            m_cursor = null;
+            m_actions.length = 0;
+        }
+        
         //--------------------------------------------------------------------------
         // STATIC
         //--------------------------------------------------------------------------

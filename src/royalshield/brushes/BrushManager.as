@@ -127,7 +127,8 @@ package royalshield.brushes
                     return;
                 
                 m_brush.hideCursor();
-                m_brush.brushManager = null;
+                m_brush.dispose();
+                m_brush = null;
             }
             
             switch (type)
