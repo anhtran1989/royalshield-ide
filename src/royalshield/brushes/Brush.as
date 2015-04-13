@@ -1,8 +1,6 @@
 package royalshield.brushes
 {
     import flash.display.Graphics;
-    import flash.filters.BitmapFilterQuality;
-    import flash.filters.GlowFilter;
     import flash.ui.Mouse;
     
     import mx.core.mx_internal;
@@ -26,7 +24,6 @@ package royalshield.brushes
         //--------------------------------------------------------------------------
         
         private var m_brushManager:IBrushManager;
-        private var m_lastTile:Tile;
         private var m_type:String;
         private var m_itemId:uint;
         private var m_size:uint;
@@ -34,7 +31,7 @@ package royalshield.brushes
         private var m_actions:Vector.<ItemMapHistoryAction>;
         
         //--------------------------------------
-        // Getters / Setters 
+        // Getters / Setters
         //--------------------------------------
         
         public function get type():String { return m_type; }
@@ -43,7 +40,16 @@ package royalshield.brushes
         public function set itemId(value:uint):void { m_itemId = value; }
         
         public function get size():uint { return m_size; }
-        public function set size(value:uint):void { m_size = value; }
+        public function set size(value:uint):void
+        {
+            value = value == 0 ? 1 : value;
+            
+            if (m_size != value) {
+                m_size = value;
+                if (m_visible)
+                    drawCursor();
+            }
+        }
         
         public function get brushManager():IBrushManager { return m_brushManager; }
         public function set brushManager(value:IBrushManager):void { m_brushManager = value; }
@@ -86,25 +92,26 @@ package royalshield.brushes
                 return;
             
             var item:Item = AssetsManager.getInstance().getItem(m_itemId);
-            if (!item)
-                return;
+            if (!item) return;
             
             var target:IDrawingTarget = m_brushManager.target;
-            var tile:Tile = target.worldMap.setTile(target.mouseMapX, target.mouseMapY, target.mouseMapZ);
-            if (!tile || tile == m_lastTile)
-                return;
-            
-            m_lastTile = tile;
-            if (tile.queryAdd(item) && tile.addItem(item)){
-                var index:int = tile.indexOfItem(item);
-                m_actions[m_actions.length] = new ItemMapHistoryAction(null, new Position(tile.x, tile.y, tile.z), item, -1, index);
+            for (var tx:int = 0; tx < m_size; tx++) {
+                for (var ty:int = 0; ty < m_size; ty++) {
+                    var px:Number = target.mouseMapX - tx;
+                    var py:Number = target.mouseMapY - ty;
+                    if (px >= 0 && py >= 0) {
+                        var tile:Tile = target.worldMap.setTile(px, py, target.mouseMapZ);
+                        if (tile && tile.queryAdd(item) && tile.addItem(item)) {
+                            var index:int = tile.indexOfItem(item);
+                            m_actions[m_actions.length] = new ItemMapHistoryAction(null, new Position(tile.x, tile.y, tile.z), item, -1, index);
+                        }
+                    }
+                }
             }
         }
         
         public function doRelease(x:uint, y:uint):void
         {
-            m_lastTile = null;
-            
             var length:uint = m_actions.length;
             if (length > 0) {
                 var description:String = StringUtil.format("Added {0} item{1} id {2}", length, length > 1 ? "s" : "", m_itemId);
@@ -139,7 +146,6 @@ package royalshield.brushes
         public function dispose():void
         {
             m_brushManager = null;
-            m_lastTile = null;
             m_type = null;
             m_itemId = 0;
             m_size = 0;
@@ -157,14 +163,21 @@ package royalshield.brushes
             var g:Graphics = target.cursorSurface.graphics;
             g.clear();
             if (m_visible) {
-                var centerX:Number = Math.floor(target.mouseX / target.measuredTileSize) * target.measuredTileSize;
-                var centerY:Number = Math.floor(target.mouseY / target.measuredTileSize) * target.measuredTileSize;
-                if (centerX >= 0 && centerX < target.width && centerY >= 0 && centerY < target.height) {
-                    g.lineStyle(0.5, 0xFFFFFF, 0.6);
-                    g.beginFill(0x0000FF, 0.3);
-                    g.drawRect(centerX, centerY, target.measuredTileSize, target.measuredTileSize);
-                    g.endFill();
+                var tileX:Number = Math.floor(target.mouseX / target.measuredTileSize);
+                var tileY:Number = Math.floor(target.mouseY / target.measuredTileSize);
+                
+                g.lineStyle(0.5, 0xFFFFFF, 0.6);
+                g.beginFill(0x0000FF, 0.3);
+                for (var x:int = 0; x < m_size; x++) {
+                    for (var y:int = 0; y < m_size; y++) {
+                        var px:Number = tileX - x;
+                        var py:Number = tileY - y;
+                        if (px >= 0 && px < target.width && py >= 0 && py < target.height) {
+                            g.drawRect(px * target.measuredTileSize, py * target.measuredTileSize, target.measuredTileSize, target.measuredTileSize);
+                        }
+                    }
                 }
+                g.endFill();
             }
         }
     }

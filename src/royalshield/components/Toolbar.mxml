@@ -4,6 +4,7 @@
          xmlns:s="library://ns.adobe.com/flex/spark"
          xmlns:mx="library://ns.adobe.com/flex/mx"
          xmlns:ide="royalshield.components.*"
+         fontSize="11"
          creationComplete="creationCompleteHandler(event)">
     
     <fx:Script>
@@ -11,9 +12,14 @@
             import mx.core.FlexGlobals;
             import mx.events.FlexEvent;
             
+            import spark.events.IndexChangeEvent;
+            
+            import royalshield.brushes.BrushManager;
+            import royalshield.brushes.IBrushManager;
             import royalshield.core.IRoyalShieldIDE;
             import royalshield.edition.EditorManager;
             import royalshield.edition.IEditorManager;
+            import royalshield.events.BrushEvent;
             import royalshield.events.EditorManagerEvent;
             
             //--------------------------------------------------------------------------
@@ -22,6 +28,7 @@
             
             private var m_application:IRoyalShieldIDE;
             private var m_editorManager:IEditorManager;
+            private var m_brushManager:IBrushManager;
             
             //--------------------------------------------------------------------------
             // METHODS
@@ -39,6 +46,8 @@
                 m_editorManager.addEventListener(EditorManagerEvent.EDITOR_CHANGED, editorManagerHandler);
                 m_editorManager.addEventListener(EditorManagerEvent.EDITOR_REMOVED, editorManagerHandler);
                 m_editorManager.addEventListener(EditorManagerEvent.MAP_CHANGED, mapChangedHandler);
+                m_brushManager = BrushManager.getInstance();
+                m_brushManager.addEventListener(BrushEvent.BRUSH_CHANGE, brushChangeHandler);
             }
             
             protected function editorManagerHandler(event:EditorManagerEvent):void
@@ -56,6 +65,17 @@
             protected function newButtonClickHandler(event:MouseEvent):void
             {
                 m_application.createNewMap();
+            }
+            
+            protected function brushChangeHandler(event:BrushEvent):void
+            {
+                brushSizeComboBox.enabled = (m_brushManager.brush != null);
+                brushSizeComboBox.selectedItem = String(m_brushManager.size);
+            }
+            
+            protected function brushSizeChangeHandler(event:IndexChangeEvent):void
+            {
+                m_brushManager.size = uint(brushSizeComboBox.selectedItem);
             }
             
         ]]>
@@ -117,5 +137,29 @@
         <ide:HistoryControl id="historyControl"/>
         
         <ide:ShadowLine height="60%"/>
+        
+        <s:Spacer width="100"/>
+        
+        <s:Label text="size:"/>
+        
+        <s:ComboBox id="brushSizeComboBox"
+                    width="70"
+                    height="21"
+                    requireSelection="true"
+                    enabled="false"
+                    restrict="1-5"
+                    change="brushSizeChangeHandler(event)">
+            <s:dataProvider>
+                <s:ArrayList>
+                    <fx:String>1</fx:String>
+                    <fx:String>2</fx:String>
+                    <fx:String>3</fx:String>
+                    <fx:String>4</fx:String>
+                    <fx:String>5</fx:String>
+                </s:ArrayList>
+            </s:dataProvider>
+        </s:ComboBox>
+        
+        <s:Spacer width="100%"/>
     </s:HGroup>
 </s:Group>

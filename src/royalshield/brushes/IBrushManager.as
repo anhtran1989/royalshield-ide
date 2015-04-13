@@ -17,8 +17,13 @@ package royalshield.brushes
         function get brushType():String;
         function set brushType(value:String):void;
         
+        function get brush():IBrush;
+        
         function get itemId():uint;
         function set itemId(value:uint):void;
+        
+        function get size():uint;
+        function set size(value:uint):void;
         
         function get cursorManager():ICursorManager;
         function set cursorManager(value:ICursorManager):void;

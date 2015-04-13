@@ -1,6 +1,7 @@
 package royalshield.brushes
 {
     import flash.events.EventDispatcher;
+    import flash.utils.Dictionary;
     
     import mx.managers.ICursorManager;
     
@@ -20,10 +21,10 @@ package royalshield.brushes
         
         private var m_target:IDrawingTarget;
         private var m_isOver:Boolean;
-        private var m_brushType:String;
         private var m_brush:IBrush;
         private var m_itemId:uint;
         private var m_cursorManager:ICursorManager;
+        private var m_sizes:Dictionary;
         
         //--------------------------------------
         // Getters / Setters
@@ -35,15 +36,17 @@ package royalshield.brushes
         public function get isOver():Boolean { return m_isOver; }
         public function set isOver(value:Boolean):void { m_isOver = value; }
         
-        public function get brushType():String { return m_brushType; }
+        public function get brushType():String { return m_brush ? m_brush.type : null; }
         public function set brushType(value:String):void
         {
             if (isNullOrEmpty(value))
                 throw new NullOrEmptyArgumentError("brushType");
                 
-            if (m_brushType != value)
+            if (!m_brush || m_brush.type != value)
                 setBrushType(value);
         }
+        
+        public function get brush():IBrush { return m_brush; }
         
         public function get itemId():uint { return m_itemId; }
         public function set itemId(value:uint):void
@@ -52,6 +55,15 @@ package royalshield.brushes
                 m_itemId = value;
                 if (m_brush)
                     m_brush.itemId = m_itemId;
+            }
+        }
+        
+        public function get size():uint { return m_brush ? m_brush.size : 1; }
+        public function set size(value:uint):void
+        {
+            if (m_brush && m_brush.size != value) {
+                m_brush.size = value;
+                m_sizes[m_brush.type] = m_brush.size;
             }
         }
         
@@ -70,6 +82,7 @@ package royalshield.brushes
             s_instance = this;
             
             m_itemId = 100; // TODO temporary
+            m_sizes = new Dictionary();
         }
         
         //--------------------------------------------------------------------------
@@ -150,6 +163,7 @@ package royalshield.brushes
             
             if (m_brush) {
                 m_brush.itemId = m_itemId;
+                m_brush.size = (m_sizes[type] !== undefined) ? uint(m_sizes[type]) : 1;
                 m_brush.brushManager = this;
                 
                 this.showCursor();
