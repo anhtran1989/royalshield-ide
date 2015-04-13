@@ -3,7 +3,82 @@
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
          xmlns:s="library://ns.adobe.com/flex/spark"
          xmlns:mx="library://ns.adobe.com/flex/mx"
-         xmlns:ide="royalshield.components.*">
+         xmlns:ide="royalshield.components.*"
+         fontSize="11"
+         creationComplete="creationCompleteHandler(event)">
+    
+    <fx:Script>
+        <![CDATA[
+            import mx.core.FlexGlobals;
+            import mx.events.FlexEvent;
+            import mx.formatters.NumberBase;
+            
+            import royalshield.core.IRoyalShieldIDE;
+            import royalshield.edition.EditorManager;
+            import royalshield.edition.IEditorManager;
+            import royalshield.events.EditorManagerEvent;
+            
+            //--------------------------------------------------------------------------
+            // PROPERTIES
+            //--------------------------------------------------------------------------
+            
+            private var m_application:IRoyalShieldIDE;
+            private var m_editorManager:IEditorManager;
+            
+            //--------------------------------------------------------------------------
+            // METHODS
+            //--------------------------------------------------------------------------
+            
+            //--------------------------------------
+            // Private
+            //--------------------------------------
+            
+            private function dataTipFormatter(value:Number):String
+            {
+                var dataFormatter:NumberBase = new NumberBase(".", ",", ".", "");
+                var precision:int = zoomSlider.getStyle("dataTipPrecision");
+                return dataFormatter.formatPrecision(String(value), precision) + "%"; 
+            }
+            
+            //--------------------------------------
+            // Event Handlers
+            //--------------------------------------
+            
+            protected function creationCompleteHandler(event:FlexEvent):void
+            {
+                m_application = IRoyalShieldIDE(FlexGlobals.topLevelApplication);
+                m_editorManager = EditorManager.getInstance();
+                m_editorManager.addEventListener(EditorManagerEvent.EDITOR_CREATED, editorManagerHandler);
+                m_editorManager.addEventListener(EditorManagerEvent.EDITOR_CHANGED, editorManagerHandler);
+                m_editorManager.addEventListener(EditorManagerEvent.EDITOR_REMOVED, editorManagerHandler);
+                m_editorManager.addEventListener(EditorManagerEvent.ZOOM_CHANGED, zoomChangedHandler);
+                
+                zoomSlider.minimum = WorldMapDisplay.MIN_ZOOM * 100;
+                zoomSlider.maximum = WorldMapDisplay.MAX_ZOOM * 100;
+                zoomSlider.dataTipFormatFunction = dataTipFormatter;
+            }
+            
+            protected function editorManagerHandler(event:EditorManagerEvent):void
+            {
+                if (m_editorManager.currentEditor) {
+                    zoomSlider.enabled = true;
+                    zoomSlider.value = m_editorManager.zoom;
+                } else 
+                    zoomSlider.enabled = false;
+            }
+            
+            protected function zoomChangedHandler(event:EditorManagerEvent):void
+            {
+                zoomSlider.value = m_editorManager.zoom * 100;
+            }
+            
+            protected function zoomSliderChangeHandler(event:Event):void
+            {
+                m_editorManager.zoom = zoomSlider.value / 100;
+            }
+            
+        ]]>
+    </fx:Script>
     
     <!-- highlight -->
     <s:Rect left="-1" right="-1" top="1" bottom="0">
@@ -26,10 +101,32 @@
               paddingTop="4"
               paddingBottom="4"
               verticalAlign="middle">
+        
         <s:Spacer width="100%"/>
+        
         <ide:ShadowLine height="100%"/>
+        
         <s:Label id="positionLabel" minWidth="80" textAlign="center"/>
+        
         <ide:ShadowLine height="100%"/>
+        
         <s:Spacer width="100%"/>
+        
+        <s:Label text="-" fontWeight="bold"/>
+        
+        <s:HSlider id="zoomSlider"
+                   stepSize="10"
+                   width="120"
+                   enabled="false"
+                   change="zoomSliderChangeHandler(event)"/>
+        
+        <s:Label text="+" fontWeight="bold"/>
+        
+        <s:Label text="{zoomSlider.value + '%'}"
+                 minWidth="40"
+                 height="100%"
+                 verticalAlign="middle"
+                 textAlign="center"
+                 backgroundColor="0x272727"/>
     </s:HGroup>
 </s:Group>

@@ -14,6 +14,7 @@ package royalshield.edition
     import royalshield.errors.NullArgumentError;
     import royalshield.errors.NullOrEmptyArgumentError;
     import royalshield.errors.SingletonClassError;
+    import royalshield.events.DrawingEvent;
     import royalshield.events.EditorManagerEvent;
     import royalshield.events.HistoryEvent;
     import royalshield.events.MapPositionEvent;
@@ -28,6 +29,7 @@ package royalshield.edition
     [Event(name="editorChanged", type="royalshield.events.EditorManagerEvent")]
     [Event(name="editorClosed", type="royalshield.events.EditorManagerEvent")]
     [Event(name="mapChanged", type="royalshield.events.EditorManagerEvent")]
+    [Event(name="zoomChanged", type="royalshield.events.EditorManagerEvent")]
     [Event(name="mousePosition", type="royalshield.events.MapPositionEvent")]
     
     public class EditorManager extends EventDispatcher implements IEditorManager
@@ -68,6 +70,13 @@ package royalshield.edition
         
         public function get canZoomIn():Boolean { return m_currentEditor && m_currentEditor.display.zoom != WorldMapDisplay.MAX_ZOOM; }
         public function get canZoomOut():Boolean { return m_currentEditor && m_currentEditor.display.zoom != WorldMapDisplay.MIN_ZOOM; }
+        
+        public function get zoom():Number { return (m_currentEditor ? m_currentEditor.display.zoom : 1); }
+        public function set zoom(value:Number):void
+        { 
+            if (m_currentEditor)
+                m_currentEditor.display.zoom = value;
+        }
         
         public function get showGrid():Boolean { return m_showGrid; }
         public function set showGrid(value:Boolean):void
@@ -310,6 +319,7 @@ package royalshield.edition
                 
                 editor.removeEventListener(FlexEvent.CREATION_COMPLETE, editorCreationCompleteHandler);
                 editor.removeEventListener(MapPositionEvent.MOUSE_POSITION, mousePositionHandler);
+                editor.display.removeEventListener(DrawingEvent.ZOOM, editorZoomHandler);
                 editor.historyManager.removeEventListener(HistoryEvent.LIST_CHANGE, historyChangedHandler);
                 editor.dispose();
                 
@@ -330,6 +340,7 @@ package royalshield.edition
         protected function editorCreationCompleteHandler(event:FlexEvent):void
         {
             var editor:IMapEditor = IMapEditor(event.target);
+            editor.display.addEventListener(DrawingEvent.ZOOM, editorZoomHandler);
             this.currentEditor = editor;
             dispatchEvent(new EditorManagerEvent(EditorManagerEvent.EDITOR_CREATED, editor));
         }
@@ -337,6 +348,12 @@ package royalshield.edition
         protected function mousePositionHandler(event:MapPositionEvent):void
         {
             dispatchEvent(event);
+        }
+        
+        protected function editorZoomHandler(event:DrawingEvent):void
+        {
+            if (m_currentEditor && m_currentEditor.display == event.target)
+                dispatchEvent(new EditorManagerEvent(EditorManagerEvent.ZOOM_CHANGED, m_currentEditor));
         }
         
         protected function historyChangedHandler(event:HistoryEvent):void

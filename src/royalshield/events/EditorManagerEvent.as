@@ -44,5 +44,6 @@ package royalshield.events
         static public const EDITOR_CHANGED:String = "editorChanged";
         static public const EDITOR_REMOVED:String = "editorRemoved";
         static public const MAP_CHANGED:String = "mapChanged";
+        static public const ZOOM_CHANGED:String = "zoomChanged";
     }
 }

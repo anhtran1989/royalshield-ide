@@ -20,6 +20,9 @@ package royalshield.edition
         function get canZoomIn():Boolean;
         function get canZoomOut():Boolean;
         
+        function get zoom():Number;
+        function set zoom(value:Number):void;
+        
         function get showGrid():Boolean;
         function set showGrid(value:Boolean):void;
         
