@@ -55,7 +55,7 @@ package royalshield.components
         private var m_zoom:Number;
         private var m_measuredTileSize:Number;
         private var m_gridSurface:FlexShape;
-        private var m_mouseTileSurface:FlexShape;
+        private var m_mouseCursorSurface:FlexShape;
         private var m_selectionSurface:SelectionSurface;
         private var m_showGrid:Boolean;
         private var m_showMouseTile:Boolean;
@@ -130,6 +130,8 @@ package royalshield.components
             }
         }
         
+        public function get cursorSurface():FlexShape { return m_mouseCursorSurface; }
+        
         public function get onMouseMapChanged():Signal { return m_mouseMapChanged; }
         
         //--------------------------------------------------------------------------
@@ -187,9 +189,8 @@ package royalshield.components
             m_gridSurface.blendMode = BlendMode.INVERT;
             addChild(m_gridSurface);
             
-            m_mouseTileSurface = new FlexShape();
-            m_mouseTileSurface.blendMode = BlendMode.INVERT;
-            addChild(m_mouseTileSurface);
+            m_mouseCursorSurface = new FlexShape();
+            addChild(m_mouseCursorSurface);
             
             m_selectionSurface = new SelectionSurface();
             addChild(m_selectionSurface);
@@ -225,7 +226,6 @@ package royalshield.components
             graphics.endFill();
             
             drawGrid(w, h);
-            drawMouseTile();
         }
         
         //--------------------------------------
@@ -283,21 +283,6 @@ package royalshield.components
                     }
                 }
                 g.endFill();
-            }
-        }
-        
-        private function drawMouseTile():void
-        {
-            var g:Graphics = m_mouseTileSurface.graphics;
-            g.clear();
-            if (m_showMouseTile) {
-                var x:Number = Math.floor(this.mouseX / m_measuredTileSize) * m_measuredTileSize;
-                var y:Number = Math.floor(this.mouseY / m_measuredTileSize) * m_measuredTileSize;
-                if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
-                    g.lineStyle(0.5, 0x000000, 0.6);
-                    g.drawRect(x, y, m_measuredTileSize, m_measuredTileSize);
-                    g.endFill();
-                }
             }
         }
         
@@ -361,7 +346,7 @@ package royalshield.components
         protected function mouseMoveHandler(event:MouseEvent):void
         {
             refreshMouseMap();
-            drawMouseTile();
+            dispatchEvent(new DrawingEvent(DrawingEvent.BRUSH_MOVE));
             
             if (m_mouseDown) {
                 m_selectionSurface.update(this.mouseX, this.mouseY);

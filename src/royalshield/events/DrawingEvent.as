@@ -31,6 +31,7 @@ package royalshield.events
         //--------------------------------------------------------------------------
         
         public static const BRUSH_PRESS:String = "brushPress";
+        public static const BRUSH_MOVE:String = "brushMove";
         public static const BRUSH_DRAG:String = "brushDrag";
         public static const BRUSH_RELEASE:String = "brushRelease";
         public static const SELECTION_START:String = "selectionStart";

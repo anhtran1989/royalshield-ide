@@ -118,6 +118,7 @@ package royalshield.drawing
         private function addListeners(target:IDrawingTarget):void
         {
             target.addEventListener(DrawingEvent.BRUSH_PRESS, targetPressHandler);
+            target.addEventListener(DrawingEvent.BRUSH_MOVE, targetMoveHandler);
             target.addEventListener(DrawingEvent.BRUSH_DRAG, targetDragHandler);
             target.addEventListener(DrawingEvent.BRUSH_RELEASE, targetReleaseHandler);
             target.addEventListener(DrawingEvent.SELECTION_START, targetSelectionStartHandler);
@@ -130,6 +131,7 @@ package royalshield.drawing
         private function removeListeners(target:IDrawingTarget):void
         {
             target.removeEventListener(DrawingEvent.BRUSH_PRESS, targetPressHandler);
+            target.removeEventListener(DrawingEvent.BRUSH_MOVE, targetMoveHandler);
             target.removeEventListener(DrawingEvent.BRUSH_DRAG, targetDragHandler);
             target.removeEventListener(DrawingEvent.BRUSH_RELEASE, targetReleaseHandler);
             target.removeEventListener(DrawingEvent.SELECTION_START, targetSelectionStartHandler);
@@ -189,6 +191,11 @@ package royalshield.drawing
         {
             onClearSelection();
             m_brushManager.doPress(m_currentTarget.mouseDownX, m_currentTarget.mouseDownY);
+        }
+        
+        private function targetMoveHandler(event:DrawingEvent):void
+        {
+            m_brushManager.doMove(m_currentTarget.mouseMapX, m_currentTarget.mouseMapY);
         }
         
         private function targetDragHandler(event:DrawingEvent):void

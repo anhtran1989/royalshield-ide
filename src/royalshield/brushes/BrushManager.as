@@ -86,6 +86,12 @@ package royalshield.brushes
                 m_brush.doPress(x, y);
         }
         
+        public function doMove(x:uint, y:uint):void
+        {
+            if (m_brush)
+                m_brush.doMove(x, y);
+        }
+        
         public function doDrag(x:uint, y:uint):void
         {
             if (m_brush)

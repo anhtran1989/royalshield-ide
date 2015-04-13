@@ -1,16 +1,13 @@
 package royalshield.brushes
 {
-    import flash.display.BitmapData;
-    import flash.display.BlendMode;
-    import flash.display.Shape;
+    import flash.display.Graphics;
     import flash.filters.BitmapFilterQuality;
     import flash.filters.GlowFilter;
+    import flash.ui.Mouse;
     
     import mx.core.mx_internal;
-    import mx.managers.CursorManagerPriority;
     
     import royalshield.assets.AssetsManager;
-    import royalshield.core.GameAssets;
     import royalshield.drawing.IDrawingTarget;
     import royalshield.edition.EditorManager;
     import royalshield.entities.items.Item;
@@ -33,8 +30,7 @@ package royalshield.brushes
         private var m_type:String;
         private var m_itemId:uint;
         private var m_size:uint;
-        private var m_cursorId:uint;
-        private var m_cursor:Shape;
+        private var m_visible:Boolean;
         private var m_actions:Vector.<ItemMapHistoryAction>;
         
         //--------------------------------------
@@ -77,6 +73,13 @@ package royalshield.brushes
                 doDrag(x, y);
         }
         
+        public function doMove(x:uint, y:uint):void
+        {
+            if (m_brushManager && m_brushManager.target && m_visible && m_itemId !== 0) {
+                drawCursor();
+            }
+        }
+        
         public function doDrag(x:uint, y:uint):void
         {
             if (m_itemId == 0)
@@ -117,34 +120,19 @@ package royalshield.brushes
         
         public function showCursor():void
         {
-            if (!m_brushManager || m_cursorId != 0 || m_itemId == 0)
-                return;
-            
-            m_cursorId = m_brushManager.cursorManager.setCursor(Shape, CursorManagerPriority.HIGH);
-            m_cursor = m_brushManager.cursorManager.currentCursor as Shape;
-            if (m_cursor) {
-                var texture:BitmapData = GameAssets.getInstance().getObjectTexturePreview(0, null);
-                m_cursor.graphics.beginBitmapFill(texture);
-                m_cursor.graphics.drawRect(0, 0, texture.width, texture.height);
-                m_cursor.blendMode = BlendMode.NORMAL;
-                m_cursor.alpha = 0.5;
-                m_cursor.filters = [OUTLINE];
-                
-                if (texture.width >= 64) {
-                    m_brushManager.cursorManager.currentCursorXOffset = -(texture.width - 16);
-                    m_brushManager.cursorManager.currentCursorYOffset = -(texture.height - 16);
-                } else {
-                    m_brushManager.cursorManager.currentCursorXOffset = -(texture.width * 0.5);
-                    m_brushManager.cursorManager.currentCursorYOffset = -(texture.height * 0.5);
-                }
+            if (m_brushManager && m_brushManager.target && !m_visible && m_itemId !== 0) {
+                m_visible = true;
+                Mouse.hide();
+                drawCursor();
             }
         }
         
         public function hideCursor():void
         {
-            if (m_cursorId != 0) {
-                m_brushManager.cursorManager.removeCursor(m_cursorId);
-                m_cursorId = 0;
+            if (m_visible) {
+                m_visible = false;
+                Mouse.show();
+                drawCursor();
             }
         }
         
@@ -155,15 +143,29 @@ package royalshield.brushes
             m_type = null;
             m_itemId = 0;
             m_size = 0;
-            m_cursorId = 0;
-            m_cursor = null;
+            m_visible = false;
             m_actions.length = 0;
         }
         
-        //--------------------------------------------------------------------------
-        // STATIC
-        //--------------------------------------------------------------------------
+        //--------------------------------------
+        // Private
+        //--------------------------------------
         
-        private static const OUTLINE:GlowFilter = new GlowFilter(0, 1, 2, 2, 4, BitmapFilterQuality.MEDIUM);
+        private function drawCursor():void
+        {
+            var target:IDrawingTarget = m_brushManager.target;
+            var g:Graphics = target.cursorSurface.graphics;
+            g.clear();
+            if (m_visible) {
+                var centerX:Number = Math.floor(target.mouseX / target.measuredTileSize) * target.measuredTileSize;
+                var centerY:Number = Math.floor(target.mouseY / target.measuredTileSize) * target.measuredTileSize;
+                if (centerX >= 0 && centerX < target.width && centerY >= 0 && centerY < target.height) {
+                    g.lineStyle(0.5, 0xFFFFFF, 0.6);
+                    g.beginFill(0x0000FF, 0.3);
+                    g.drawRect(centerX, centerY, target.measuredTileSize, target.measuredTileSize);
+                    g.endFill();
+                }
+            }
+        }
     }
 }

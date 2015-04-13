@@ -16,6 +16,7 @@ package royalshield.brushes
         function set brushManager(value:IBrushManager):void;
         
         function doPress(x:uint, y:uint):void;
+        function doMove(x:uint, y:uint):void;
         function doDrag(x:uint, y:uint):void;
         function doRelease(x:uint, y:uint):void;
         function showCursor():void;
